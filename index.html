@@ -1,0 +1,72 @@
+<html>
+<!-- 
+    This file is for demonstrating the embedding of Omise.js module.
+    For more details: https://www.omise.co/collecting-card-information
+>
+
+<!-- 
+    Omise.js does the following:
+  
+    1. User enters his/her sensitive credit card data
+       via the client browser(Omise.js embedded in it).
+  
+    2. Omise.js encrypts sends the data(1.) into a token. [with merchant's public key?]
+  
+    3. token(T) is sent to Omise Server.
+       (it is saved in the sensitive DB on the server which PCI-DSS compliant)
+  
+    4. token(T) is forwarded back to merchant's server(M).
+       (yet it is not good practice to store that token to M sinc if it is compromised,
+        can cause the severe security bleech)
+  
+    5. with T, you can do the following:
+      - charge the card
+      - save the card on a new customer
+      - attach a card to the existing customer
+-->
+<script src="https://cdn.omise.co/omise.js"></script>
+
+
+<!-- jquery usage is not mandatory -->
+<script src="http://code.jquery.com/jquery-1.12.1.min.js"></script>
+
+<!--
+
+    Set merchant's public key here: 
+    
+    As Convention, our keys are defined as follows:
+
+    Public Key: /^pkey_.+/
+    Secret Key: /^skey_.+/
+
+    When Secret Key has been compromised, your business is exposed at risk
+    So please keep it secret always and never expose it anywhere.
+
+-->
+<script>
+    Omise.setPublicKey("pkey_test_4xpip92iqmehclz4a4d");
+</script>
+
+
+<!--
+
+    Form for customers to submit their credit card data
+
+-->
+
+<form action="./checkout.html" method="post" id="checkout">
+    <div id="token_errors"/>
+    <input type="hidden" name="omise_token">
+
+    <div>Name<br><input type="text" data-omise="holder_name"></div>
+    <div>Number<br><input type="text" data-omise="number"></div>
+    <div>Date<br>
+        <input type="text" data-omise="expiration_month" size="4"> /
+        <input type="text" data-omise="expiration_year" size="8">
+    </div>
+
+    <div>Security Code<br><input type="text" data-omise="security_code" size="8"></div>
+    <input type="submit" id="create_token">
+</form>
+
+</html>

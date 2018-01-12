@@ -1,4 +1,10 @@
 <html>
+<title> Omise.js usage sample </title>
+
+<head>
+    <font face = "Verdana" size = "5">Please Enter your Credit Card Information below:</font>
+</head>
+
 <!-- 
     This file is for demonstrating the embedding of Omise.js module.
     For more details: https://www.omise.co/collecting-card-information
@@ -52,21 +58,86 @@
 
     Form for customers to submit their credit card data
 
+    This example has presets of fake credit card data such as:
+
+    Name:   Vitalik Buterin
+    Number: 4343434343434343 
+    Date:   02/2019
+    CVV:    636
+
 -->
+<body>
+    <br><br>
+    <form action="./checkout.html" method="post" id="checkout">
+        <div id="token_errors"/>
+        <input type="hidden" name="omise_token">
 
-<form action="./checkout.html" method="post" id="checkout">
-    <div id="token_errors"/>
-    <input type="hidden" name="omise_token">
+        <font face = "Verdana" size = "3">
+            <div>Name<br><input type="text" value="Vitalik Buterin" data-omise="holder_name"></div><br>
+            <div>Number<br><input type="text" value="4343434343434343" data-omise="number"></div><br>
+            <div>Date<br>
+                <input type="text" data-omise="expiration_month" value="02" size="4"> /
+                <input type="text" data-omise="expiration_year" value="2019" size="8">
+            </div><br>
 
-    <div>Name<br><input type="text" data-omise="holder_name"></div>
-    <div>Number<br><input type="text" data-omise="number"></div>
-    <div>Date<br>
-        <input type="text" data-omise="expiration_month" size="4"> /
-        <input type="text" data-omise="expiration_year" size="8">
-    </div>
+            <div>Security Code<br>
+                <input type="text" data-omise="security_code" value="636" size="8">
+            </div>
+            <input type="submit" id="create_token">
+        </font>    
+    </form>
+</body>    
 
-    <div>Security Code<br><input type="text" data-omise="security_code" size="8"></div>
-    <input type="submit" id="create_token">
-</form>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js">
+    $("#checkout").submit(function () {
+
+      var form = $(this);
+
+      // Disable the submit button to avoid repeated click.
+      form.find("input[type=submit]").prop("disabled", true);
+
+      // Serialize the form fields into a valid card object.
+      var card = {
+        "name": form.find("[data-omise=holder_name]").val(),
+        "number": form.find("[data-omise=number]").val(),
+        "expiration_month": form.find("[data-omise=expiration_month]").val(),
+        "expiration_year": form.find("[data-omise=expiration_year]").val(),
+        "security_code": form.find("[data-omise=security_code]").val()
+      };
+
+      // Send a request to create a token then trigger the callback function once
+      // a response is received from Omise.
+      //
+      // Note that the response could be an error and this needs to be handled within
+      // the callback.
+      Omise.createToken("card", card, function (statusCode, response) {
+        if (response.object == "error" || !response.card.security_code_check) {
+          // Display an error message.
+          var message_text = "SET YOUR SECURITY CODE CHECK FAILED MESSAGE";
+          if(response.object == "error") {
+            message_text = response.message;
+          }
+          $("#token_errors").html(message_text);
+
+          // Re-enable the submit button.
+          form.find("input[type=submit]").prop("disabled", false);
+        } else {
+          // Then fill the omise_token.
+          form.find("[name=omise_token]").val(response.id);
+
+          // Remove card number from form before submiting to server.
+          form.find("[data-omise=number]").val("");
+          form.find("[data-omise=security_code]").val("");
+
+          // submit token to server.
+          form.get(0).submit();
+        };
+      });
+
+      // Prevent the form from being submitted;
+      return false;
+
+    });
+</script>
 
 </html>

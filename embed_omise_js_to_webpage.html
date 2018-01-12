@@ -37,124 +37,128 @@
 <script src="http://code.jquery.com/jquery-1.12.1.min.js"></script>
 
 <!--
-
-    Set merchant's public key here: 
-    
-    As Convention, our keys are defined as follows:
-
-    Public Key: /^pkey_.+/
-    Secret Key: /^skey_.+/
-
-    When Secret Key has been compromised, your business is exposed at risk
-    So please keep it secret always and never expose it anywhere.
-
--->
-<script> Omise.setPublicKey("pkey_test_4xpip92iqmehclz4a4d"); </script>
-
-<!--
-
     Form for customers to submit their credit card data
-    This example has presets of fake credit card data such as:
-
-    Name:   Vitalik Buterin
-    Number: 4242424242424242 
-    Date:   02/2019
-    CVV:    636
-
 -->
-<body>
-    <br><br>
+<body style="position:relative;left:30px;top:50px;">
+    <font face = "Verdana" size = "3" />
     <form action="./checkout.html" method="post" id="checkout">
-        <div id="token_errors"/>
-        <input type="hidden" name="omise_token">
-
-        <font face = "Verdana" size = "3">
-            <div>Name<br><input type="text" value="Vitalik Buterin" data-omise="holder_name"></div><br>
-            <div>Number<br><input type="text" value="4242424242424242" data-omise="number"></div><br>
-            <div>Date<br>
-                <input type="text" data-omise="expiration_month" value="02" size="4"> /
-                <input type="text" data-omise="expiration_year" value="2019" size="8">
-            </div><br>
-            <div>Security Code<br>
-                <input type="text" data-omise="security_code" value="636" size="8">
-            </div>
-            <!-- Submit Button(S) -->
-            <input type="submit" id="create_token" onclick="createAndSubmitOmiseTokenToServer();" />
-        </font>    
+        <div class="section">
+            <label>Card Number</label>
+            <input class="text_box" type="text" id="cardNumber" placeholder="••••••••••••••••" />
+        </div>
+  
+        <div class="section">
+            <label>Name on card</label>
+            <input class="text_box" type="text" id="nameOnCard" placeholder="Full Name" />
+        </div>
+  
+        <div class="section">
+          <label>Expiry date</label>
+          <select class="text_box" id="expiryMonth">
+              <option value="">MM</option>
+              <option value="1">1</option>
+              <option value="12">12</option>
+          </select>
+  
+          <select class="text_box_2" id="expiryYear">
+              <option value="">YYYY</option>
+              <option value="2017">2017</option>
+              <option value="2025">2025</option>
+          </select>
+        </div>
+  
+        <div class="section">
+            <label>Security code</label>
+            <input class="text_box" type="text" id="securityCode" placeholder="123" />
+        </div>
+    
+        <div class="button" onclick="createAndSubmitOmiseTokenToServer();">
+            <button>Checkout</button>
+        </div>
     </form>
 </body>    
 
+<style>
+   .section {
+       position: relative;
+       left:     30px;
+       top:      55px;
+   }  
+   .text_box {
+       position: absolute;
+       left:     150px;
+   }  
+
+   .text_box_2 {
+       position: absolute;
+       left:     210px;
+   }  
+
+   .button {
+       position: relative;
+       left:     30px;
+       top:      100px;
+   } 
+</style>
+
 <script type="text/javascript">
-    function createAndSubmitOmiseTokenToServer() {
-        try {
-            var form = $(this);
-            disableSubmitButtonToAvoidRepeatedClick(form);
-            createToken(form, getCard(form));
-            return false; // Prevent the form from being submitted;
+    function createAndSubmitOmiseTokenToServer(){
+        try{
+            setPublicKey();
+            createToken(getCard());
         }catch(err){
             alert(err.stack);
-        }    
+        }               
     }
 
-   function disableSubmitButtonToAvoidRepeatedClick(form){
-       form.find("input[type=submit]").prop("disabled", true);
-   }
+    /** 
+     *   Set merchant's public key here: 
+     *   
+     *   As Convention, our keys are defined as follows:
+
+     *   Public Key: /^pkey_.+/
+     *   Secret Key: /^skey_.+/
+
+     *   When Secret Key has been compromised, your business is exposed at risk
+     *   So please keep it secret always and never expose it anywhere.
+     */
+    function setPublicKey(){
+        Omise.setPublicKey("pkey_test_4xpip92iqmehclz4a4d");
+    }
 
     /**
-    *
-    *   1. Send a request to create a token(T)
-    *   2. Trigger the callback function once a response is received from Omise.
-    *  
-    *   Note that the response could be an error
-    *   and this needs to be handled within the callback.
-    *
-    **/
-    function createToken(form, card){
-       Omise.createToken("card", card, function (statusCode, response) {
-         if (isError(response)) {
-             showErrorAndReEnableSubmitButton(form, response); 
-         } else {
-             fillAndSubmitOmiseTokenToServer(form, response);
-         }
-       });
+     * XXX NEED TO FIX THE FOLLOWING ERROR:
+     *
+     * TypeError: Cannot read property '2' of null at v 
+     * (https://cdn.omise.co/omise.js:7:12728) at C 
+     * (https://cdn.omise.co/omise.js:7:14985) at new B.Rpc 
+     */
+    function createToken(card) {
+        Omise.createToken('card', card, function(statusCode, response) {
+            if (isSuccess(statusCode)) {
+                // do something
+            } else {
+                console.log(response.message);
+            }
+          });
     }
 
-    function fillAndSubmitOmiseTokenToServer(form, response){
-        // Then fill the omise_token.
-        form.find("[name=omise_token]").val(response.id);
-
-        // Remove card number from form before submiting to server.
-        form.find("[data-omise=number]").val("");
-        form.find("[data-omise=security_code]").val("");
-
-        // submit token to server.
-        form.get(0).submit();
-    }
-
-    function showErrorAndReEnableSubmitButton(form, response){
-        var message_text = "SET YOUR SECURITY CODE CHECK FAILED MESSAGE";
-        if(response.object == "error") {
-          message_text = response.message;
-        }
-        $("#token_errors").html(message_text);
-
-        // Re-enable the submit button.
-        form.find("input[type=submit]").prop("disabled", false);   
-    }
-
-    function isError(response){
-        return (response.object == "error" || !response.card.security_code_check);
-    }
-
-    // Serialize the form fields into a valid card object.
-    function getCard(form){
+    function getCard(){
         return {
-            "name":             form.find("[data-omise=holder_name]").val(),
-            "number":           form.find("[data-omise=number]").val(),
-            "expiration_month": form.find("[data-omise=expiration_month]").val(),
-            "expiration_year":  form.find("[data-omise=expiration_year]").val(),
-            "security_code":    form.find("[data-omise=security_code]").val()
+            name:             getInputValue('nameOnCard'),
+            number:           getInputValue('cardNumber'),
+            expiration_month: getInputValue('expiryMonth'),
+            expiration_year:  getInputValue('expiryYear'),
+            security_code:    getInputValue('securityCode')
         };
     }
-</script>
+
+    function getInputValue(key){
+        return document.getElementById(key).value
+    }
+
+    function isSuccess(statusCode){
+        return statusCode === 200;
+    }
+</script>    
 </html>

@@ -79,16 +79,23 @@
                 <input type="text" data-omise="expiration_month" value="02" size="4"> /
                 <input type="text" data-omise="expiration_year" value="2019" size="8">
             </div><br>
-
             <div>Security Code<br>
                 <input type="text" data-omise="security_code" value="636" size="8">
             </div>
+            <!-- Submit Button(S) -->
             <input type="submit" id="create_token">
         </font>    
     </form>
 </body>    
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js">
+    /**
+     *
+     *  Trigger the creation of the token(T) when the submit button(S) is pressed.
+     *  Then fill the token field and clear the other fields so they are
+     *  not submitted to your server.
+     *
+     */
     $("#checkout").submit(function () {
 
       var form = $(this);
@@ -98,18 +105,22 @@
 
       // Serialize the form fields into a valid card object.
       var card = {
-        "name": form.find("[data-omise=holder_name]").val(),
-        "number": form.find("[data-omise=number]").val(),
-        "expiration_month": form.find("[data-omise=expiration_month]").val(),
-        "expiration_year": form.find("[data-omise=expiration_year]").val(),
-        "security_code": form.find("[data-omise=security_code]").val()
+          "name":             form.find("[data-omise=holder_name]").val(),
+          "number":           form.find("[data-omise=number]").val(),
+          "expiration_month": form.find("[data-omise=expiration_month]").val(),
+          "expiration_year":  form.find("[data-omise=expiration_year]").val(),
+          "security_code":    form.find("[data-omise=security_code]").val()
       };
 
-      // Send a request to create a token then trigger the callback function once
-      // a response is received from Omise.
-      //
-      // Note that the response could be an error and this needs to be handled within
-      // the callback.
+      /**
+       *
+       *   1. Send a request to create a token(T)
+       *   2. Trigger the callback function once a response is received from Omise.
+       *  
+       *   Note that the response could be an error
+       *   and this needs to be handled within the callback.
+       *
+       **/
       Omise.createToken("card", card, function (statusCode, response) {
         if (response.object == "error" || !response.card.security_code_check) {
           // Display an error message.
@@ -136,7 +147,6 @@
 
       // Prevent the form from being submitted;
       return false;
-
     });
 </script>
 

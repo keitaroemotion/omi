@@ -1,0 +1,41 @@
+# https://www.omise.co/charges-api
+# [query parameters]
+#
+# customer   	| object_id	| A valid CUSTOMER_ID that has at least one card
+#                         | already associated. By default the default card of
+#                         | the customer will be used. This parameter is required
+#                         | unless passing a TOKEN_ID in the card parameter.
+# card        |	object_id	| A valid unused TOKEN_ID or CARD_ID. In the case of the
+#                         | CARD_ID the customer parameter must be present and be the
+#                         | owner of the card. For the TOKEN_ID, the customer must not be passed.
+# amount      |	integer	  | The amount in the smallest subunits of the currency used.
+#                         | For thb (Thai Baht) you'll need to pass the amount in satangs.
+#                         | #Maxmum and Minimum amount by supported currencies
+# currency   	| string	  | The currency in which you want the charge to be done.
+#                         | The default and only valid value is thb. #Supported Currencies
+# description	| string	  | A custom description for the charge. This value can be
+#                         | searched for in your dashboard.
+# metadata    |	Hash	    | Any JSON hash you would like to attach to this charge.
+#                         | You can use this key to store order ID or internal reference ID.
+# capture     |	boolean	  | Whether or not you want the charge to be captured right away,
+#                         | when not specified it is set to true.
+# return_uri	| url	      | The url where we will return the customer after the charge has
+#                         | been authorized with 3-D Secure.
+# 
+# [respose status]
+# insufficient_fund      | Insufficient funds in the account or the card has
+#                        | reached the credit limit.
+# stolen_or_lost_card	   | Card is stolen or lost.
+# failed_processing	     | Card processing has failed, you may retry this transaction.
+# payment_rejected	     | The payment was rejected by the issuer or the acquirer
+#                        | with no specific reason.
+# invalid_security_code	 | The security code was invalid or the card didn't pass preauth.
+# failed_fraud_check     | Card was marked as fraudulent.
+# invalid_account_number | This number is not attributed or has been deactivated.
+
+curl https://api.omise.co/charges \
+  -X POST \
+  -u $skey \
+  -d "amount=100000" \
+  -d "currency=thb" \
+  -d "card=tokn_test_4xs9408a642a1htto8z"

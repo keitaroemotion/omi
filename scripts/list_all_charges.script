@@ -1,2 +1,0 @@
-curl -X GET https://api.omise.co/charges \
-  -u $skey

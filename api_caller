@@ -9,9 +9,9 @@
 script_path = ARGV[0]
 CONFIG_PATH = "config"
 
-abort "script path is missing" unless script_path
+abort "script path is missing"              unless script_path
 abort "file does not exist: #{script_path}" unless File.exist?(script_path)
-abort "config file missing" unless File.exist?(CONFIG_PATH)
+abort "config file missing"                 unless File.exist?(CONFIG_PATH)
 
 def config
   lines = File.open(CONFIG_PATH, "r").each_line.to_a

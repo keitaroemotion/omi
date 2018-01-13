@@ -22,7 +22,7 @@
        (it is saved in the sensitive DB on the server which PCI-DSS compliant)
   
     4. token(T) is forwarded back to merchant's server(M).
-       (yet it is not good practice to store that token to M sinc if it is compromised,
+       (yet it is not good practice to store that token to M since if it is compromised,
         can cause the severe security bleech)
   
     5. with T, you can do the following:
@@ -32,16 +32,13 @@
 -->
 <script src="https://cdn.omise.co/omise.js"></script>
 
-
-<!-- jquery usage is not mandatory -->
-<script src="http://code.jquery.com/jquery-1.12.1.min.js"></script>
-
 <!--
     Form for customers to submit their credit card data
 -->
 <body style="position:relative;left:30px;top:50px;">
     <font face = "Verdana" size = "3" />
     <form action="./checkout.html" method="post" id="checkout">
+        <div id="token_errors"></div>
         <div class="section">
             <label>Card Number</label>
             <input class="text_box" type="text" id="cardNumber" placeholder="••••••••••••••••" />
@@ -134,6 +131,7 @@
      * (https://cdn.omise.co/omise.js:7:14985) at new B.Rpc 
      */
     function createToken(card) {
+        alert(JSON.stringify(card));
         Omise.createToken('card', card, function(statusCode, response) {
             if (isSuccess(statusCode)) {
                 // do something

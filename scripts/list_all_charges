@@ -3,9 +3,9 @@
 # offset | integer  | The offset of the first record returned. 
 #                     I.e.: How many records to skip from the beginning. 
 # limit  | integer  | The maximum amount of records returned.
-# from   | datetime |	The UTC date and time limiting the beginning of
+# from   | datetime | The UTC date and time limiting the beginning of
 #                     returned records. E.g.: 2014-10-20T00:00:00Z
-# to     | datetime	| The UTC date and time limiting the end of returned records.
+# to     | datetime | The UTC date and time limiting the end of returned records.
 #                     E.g.: 2015-01-20T00:00:00Z
 # order  | string   | The order of the list returned. 
 #                     I.e.: chronological (from earliest to latest),

@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+
+#
+# YOU NEED TO USE API_CALLER SUCH AS:
+#
+# ./api_caller scripts/*.script skey_*
+#
+
+script_path = ARGV[0]
+skey        = ARGV[1]
+
+abort "script path is missing" unless script_path
+abort "file does not exist: #{script_path}" unless File.exist?(script_path)
+
+abort "skey is missing" unless skey
+abort "skey:#{skey} is not in good format" unless /^skey_/ =~ skey
+
+script_body =  File.read(script_path).gsub("$skey", skey)
+
+puts "-------------------------"
+puts "[Command]\n#{script_body}"
+puts "-------------------------"
+
+system script_body

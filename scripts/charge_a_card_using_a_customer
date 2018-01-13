@@ -38,5 +38,4 @@ curl https://api.omise.co/charges \
   -u $skey \
   -d "amount=100" \
   -d "currency=thb" \
-  -d "customer=cust_test_4xtrb759599jsxlhkrb" \
-  -d "card=card_test_4xtsoy2nbfs7ujngyyq"
+  -d "customer=cust_test_4xtrb759599jsxlhkrb"

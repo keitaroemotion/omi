@@ -1,0 +1,9 @@
+# description | string | A custom description for the charge.
+#                      | This value can be searched for in your dashboard.
+# metadata    | Hash   | Any JSON hash you would like to attach to this charge.
+#                      | You can use this key to store order ID or internal reference ID.
+# 
+curl https://api.omise.co/charges/chrg_test_4xso2s8ivdej29pqnhz \
+  -X PATCH \
+  -u $skey \
+  -d "description=Another description"

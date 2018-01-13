@@ -1,0 +1,2 @@
+curl https://api.omise.co/charges/chrg_test_4xso2s8ivdej29pqnhz \
+  -u $skey

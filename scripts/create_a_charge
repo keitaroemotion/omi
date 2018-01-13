@@ -1,7 +1,7 @@
 # https://www.omise.co/charges-api
 # [query parameters]
 #
-# customer   	| object_id	| A valid CUSTOMER_ID that has at least one card
+# customer    | object_id	| A valid CUSTOMER_ID that has at least one card
 #                         | already associated. By default the default card of
 #                         | the customer will be used. This parameter is required
 #                         | unless passing a TOKEN_ID in the card parameter.
@@ -11,7 +11,7 @@
 # amount      |	integer	  | The amount in the smallest subunits of the currency used.
 #                         | For thb (Thai Baht) you'll need to pass the amount in satangs.
 #                         | #Maxmum and Minimum amount by supported currencies
-# currency   	| string	  | The currency in which you want the charge to be done.
+# currency    | string	  | The currency in which you want the charge to be done.
 #                         | The default and only valid value is thb. #Supported Currencies
 # description	| string	  | A custom description for the charge. This value can be
 #                         | searched for in your dashboard.

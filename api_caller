@@ -3,7 +3,7 @@
 #
 # YOU NEED TO USE API_CALLER SUCH AS:
 #
-# ./api_caller scripts/*.script skey_*
+# ./api_caller scripts/*.script
 #
 
 script_path = ARGV[0]
@@ -15,7 +15,7 @@ abort "config file missing" unless File.exist?(CONFIG_PATH)
 
 def config
   lines = File.open(CONFIG_PATH, "r").each_line.to_a
-  lines.map{ |line| line.split("=").map{ |x| x.chomp } }.flatten
+  lines.map{ |line| line.split("=").map(&:chomp) }.flatten
 end
 
 config_hash = Hash[*(config)]
@@ -23,7 +23,10 @@ skey        = config_hash["skey"]
 script_body = File.read(script_path).gsub("$skey", skey)
 
 puts "-------------------------"
-puts "[Command]\n#{script_body}"
+puts "[Command]\n"
+script_body.lines.each do |line|
+  puts line unless line.start_with?("#")
+end
 puts "-------------------------"
 
 system script_body

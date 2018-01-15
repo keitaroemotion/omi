@@ -26,3 +26,7 @@ $./api_caller scripts/[api_to_call]
 ## TODOs
 
 let api_caller to be installer to the system and be accessible from anywhere (not that hard)
+let api_caller do as follows:
+  a ${call_another_api_and_return_the_result_params} variable embedded in the caller script file
+  does squentially execute the request such that no need to execute the pre-state stuff.
+  or, make new flow to combine apis and bind those, kind of Turing-Incomplete style.

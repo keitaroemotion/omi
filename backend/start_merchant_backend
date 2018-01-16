@@ -1,0 +1,5 @@
+ipv4=$(curl -s ipecho.net/plain)
+$port=3000
+echo; echo "your address is: $ipv4"; echo
+bundle install
+bin/rails server

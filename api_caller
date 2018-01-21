@@ -95,7 +95,7 @@ script_body = list_values_and_substitute(script_body, skey, "customer", "cust_")
 script_body = list_values_and_substitute(script_body, skey, "charge", "chrg_")
 
 unless script_path.include?("curl -s")
-  script_body = script_body.gsub("curl", "curl -s")
+    script_body = script_body.gsub("curl", "curl -s")
 end
 
 puts "-------------------------"

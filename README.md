@@ -2,6 +2,13 @@
 
 This repository is the tutorial how to use Omise.js | Omise APIs using examples.
 
+## Instruction
+
+Please do the following:
+```
+$ bundle install
+```
+
 ## collecting_cards.html
 
 This file is the real example to demonstrate how to embed Omise.js to collect cards of your customers.

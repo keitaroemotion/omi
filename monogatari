@@ -29,10 +29,21 @@ def create_a_token
     result
 end    
 
-case ARGV[0]
-when "1"
+options = [
+    "Create token",
+    "Create customer with card -> Charge the customer "  
+]
+
+options.each_with_index do |e, i|
+    puts "[#{i}] #{e}"
+end
+
+print "[choose monogatari]: "
+
+case $stdin.gets.chomp
+when "0"
     create_a_token
-when "2"    
+when "1"    
     result = create_a_customer_and_attach_a_card
     puts result
     customer = /cust_[a-z0-9_]+/.match(result.join).to_s

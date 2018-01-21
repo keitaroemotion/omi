@@ -1,6 +1,6 @@
-# Omise Turorial
+# Omise Sugoi
 
-This repository is the tutorial how to use Omise.js | Omise APIs using examples.
+This repository is the easy demo tool of Omise API and tutorial how to use Omise.js
 
 ## Instruction
 

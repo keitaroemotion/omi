@@ -30,5 +30,13 @@ after that, please do the following:
 $./api_caller scripts/[api]/[api_to_call]
 ```
 
+## monogatari
+
+This script allows you to demo the various scenarios without messing around with which API to use and which order. Just watch the sample story:
+
+```
+$ ./monogatari
+```
+
 ## Special Thanks
 Thanks to Mr. Akira Narita, it is possible to test the Omise Webhook API with his [omise-webhook](http://akinrt.hatenablog.com/entry/omise-webhook) module. If you quickly want to test Omise-Webhook API without launching SSL/TLS certificate enhancing https website, his repository helps you.

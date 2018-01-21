@@ -69,7 +69,7 @@ def substitute(key, script_body, options, config)
     script_body
 end        
 
-def list_values_and_substitute(script_body, skey, api, prefix)
+def list_values_and_substitute(script_body, skey, api, prefix, options)
     if script_body.include?("$#{api}") 
        puts
        list = `curl -s -X GET https://api.omise.co/#{api}s -u #{skey}:`
@@ -77,12 +77,16 @@ def list_values_and_substitute(script_body, skey, api, prefix)
            .select { |a| a.include?(prefix) }
            .map    { |a| /#{prefix}[a-z0-9_]+/.match(a).to_s.strip }
            .uniq
-       list.each_with_index { |e, i| 
-           puts "[#{i}] #{e}"
-       }
-       print "\n[which?] "    
-       input = $stdin.gets.chomp.to_i 
-       value = list[input]
+       if api == "customer" && options["customer"]
+           value = options["customer"]
+       else
+           list.each_with_index { |e, i| 
+               puts "[#{i}] #{e}"
+           }
+           print "\n[which?] "    
+           input = $stdin.gets.chomp.to_i 
+           value = list[input]
+       end    
        script_body = script_body.gsub("$#{api}", value)
     end
     script_body
@@ -91,8 +95,8 @@ end
 script_body = substitute("token", script_body, options, config_hash)
 script_body = substitute("dispute", script_body, options, config_hash)
 script_body = substitute("amount", script_body, options, config_hash)
-script_body = list_values_and_substitute(script_body, skey, "customer", "cust_")
-script_body = list_values_and_substitute(script_body, skey, "charge", "chrg_")
+script_body = list_values_and_substitute(script_body, skey, "customer", "cust_", options)
+script_body = list_values_and_substitute(script_body, skey, "charge", "chrg_", options)
 
 unless script_path.include?("curl -s")
     script_body = script_body.gsub("curl", "curl -s")

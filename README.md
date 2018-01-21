@@ -13,20 +13,15 @@ api_caller does call Omise Api. Initially you need to go to [Omise Dashboard](ht
 then touch the file name `config` and edit as follows:
 
 ```
-skey=[your skey on Omise Dashboard]
+skey=[your secret key on Omise Dashboard]
+pkey=[your public key on Omise Dashboard]
 ```
 
 after that, please do the following:
 
 ```
-$./api_caller scripts/[api_to_call]
+$./api_caller scripts/[api]/[api_to_call]
 ```
 
-
-## TODOs
-
-let api_caller to be installer to the system and be accessible from anywhere (not that hard)
-let api_caller do as follows:
-  a ${call_another_api_and_return_the_result_params} variable embedded in the caller script file
-  does squentially execute the request such that no need to execute the pre-state stuff.
-  or, make new flow to combine apis and bind those, kind of Turing-Incomplete style.
+## Special Thanks
+Thanks to Mr. Akira Narita, it is possible to test the Omise Webhook API with his [omise-webhook](http://akinrt.hatenablog.com/entry/omise-webhook) module. If you quickly want to test Omise-Webhook API without launching SSL/TLS certificate enhancing https website, his repository helps you.

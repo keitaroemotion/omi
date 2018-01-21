@@ -1,0 +1,2 @@
+curl https://api.omise.co/charges/$charge/refunds \
+  -u $skey 

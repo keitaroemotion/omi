@@ -1,0 +1,2 @@
+curl https://api.omise.co/disputes/pending \
+  -u $skey

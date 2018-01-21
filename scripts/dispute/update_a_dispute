@@ -1,0 +1,4 @@
+curl https://api.omise.co/disputes/$dispute \
+  -X PATCH \
+  -u $skey \
+  -d "message=Unauthorized transaction"

@@ -37,5 +37,5 @@ curl https://api.omise.co/charges \
   -X POST \
   -u $skey \
   -d "amount=100" \
-  -d "currency=thb" \
-  -d "customer=cust_test_4xtrb759599jsxlhkrb"
+  -d "currency=jpy" \
+  -d "customer=$customer"

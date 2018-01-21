@@ -1,0 +1,2 @@
+curl https://vault.omise.co/tokens/$token \
+  -u $pkey

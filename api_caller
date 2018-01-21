@@ -13,6 +13,8 @@
 #
 # XXX might need to make this application installable  
 
+require "colorize"
+
 def help
     puts "\napi_caller scripts/*\n\n"
     abort
@@ -24,19 +26,73 @@ end
 
 script_path = ARGV[0]
 CONFIG_PATH = "config"
+HAS_EQUAL   = /^.+\=.+$/
+
+def get_options
+    list = ARGV
+        .select { |a| a =~ HAS_EQUAL           }
+        .map    { |a| a.split('=').map(&:to_s) }
+        .flatten
+    Hash[*list]  
+end
+
+options = get_options
 
 abort "script path is missing"              unless script_path
 abort "file does not exist: #{script_path}" unless File.exist?(script_path)
 abort "config file missing"                 unless File.exist?(CONFIG_PATH)
 
 def config
-    lines = File.open(CONFIG_PATH, "r").each_line.to_a
+    lines = File
+        .open(CONFIG_PATH, "r")
+        .each_line
+        .to_a
+        .select { |a| a =~ HAS_EQUAL } 
     lines.map{ |line| line.split("=").map(&:chomp) }.flatten
 end
 
 config_hash = Hash[*(config)]
 skey        = config_hash["skey"]
-script_body = File.read(script_path).gsub("$skey", skey)
+pkey        = config_hash["pkey"]
+script_body = File.read(script_path).gsub("$skey", skey).gsub("$pkey", pkey)
+
+def substitute(key, script_body, options, config)
+    if script_body.include?("$#{key}")
+        if options[key]
+            script_body = script_body.gsub("$#{key}", options[key])  
+        elsif config[key]    
+            script_body = script_body.gsub("$#{key}", config[key])  
+        else
+            abort "You need argument #{key}="
+        end
+    end
+    script_body
+end        
+
+def list_values_and_substitute(script_body, skey, api, prefix)
+    if script_body.include?("$#{api}") 
+       puts
+       list = `curl -s -X GET https://api.omise.co/#{api}s -u #{skey}:`
+           .split("\n")
+           .select { |a| a.include?(prefix) }
+           .map    { |a| /#{prefix}[a-z0-9_]+/.match(a).to_s.strip }
+           .uniq
+       list.each_with_index { |e, i| 
+           puts "[#{i}] #{e}"
+       }
+       print "\n[which?] "    
+       input = $stdin.gets.chomp.to_i 
+       value = list[input]
+       script_body = script_body.gsub("$#{api}", value)
+    end
+    script_body
+end
+
+script_body = substitute("token", script_body, options, config_hash)
+script_body = substitute("dispute", script_body, options, config_hash)
+script_body = substitute("amount", script_body, options, config_hash)
+script_body = list_values_and_substitute(script_body, skey, "customer", "cust_")
+script_body = list_values_and_substitute(script_body, skey, "charge", "chrg_")
 
 unless script_path.include?("curl -s")
   script_body = script_body.gsub("curl", "curl -s")
@@ -44,12 +100,18 @@ end
 
 puts "-------------------------"
 puts "[Command]\n"
-script_body.lines.each do |line|
-    puts line unless line.start_with?("#")
-end
+puts script_body.lines.select { |line| !(line.start_with?("#")) }.join.chomp.green
 puts "-------------------------"
 
 shell_execution_result = `#{script_body}`
-
-response_params = 
 puts shell_execution_result
+
+if File.basename(script_path) == "create_a_token"
+    token = shell_execution_result
+        .split("\n")
+        .select{ |a| a.include?("tokn_")             }
+        .map   { |a| /tokn_[a-z0-9_]+/.match(a).to_s }
+        .flatten
+        .uniq
+    `echo token=#{token.first} | pbcopy`    
+end

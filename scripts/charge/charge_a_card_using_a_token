@@ -36,6 +36,6 @@
 curl https://api.omise.co/charges \
   -X POST \
   -u $skey \
-  -d "amount=100000" \
-  -d "currency=thb" \
-  -d "card=tokn_test_4xs9408a642a1htto8z"
+  -d "amount=100" \
+  -d "currency=jpy" \
+  -d "card=$token"

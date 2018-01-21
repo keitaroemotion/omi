@@ -8,7 +8,7 @@ This file is the real example to demonstrate how to embed Omise.js to collect ca
 
 ## api_caller
 
-api_caller does call Omise Api. Initially you need to go to [Omise Dashboard](https://dashboard.omise.co/test/keys) and copy its private key starts from `skey_`
+api_caller does call Omise Api. Initially you need to go to [Omise Dashboard](https://dashboard.omise.co/test/keys) and copy its public | private key starts from `skey_`
 
 then touch the file name `config` and edit as follows:
 

@@ -38,6 +38,10 @@ config_hash = Hash[*(config)]
 skey        = config_hash["skey"]
 script_body = File.read(script_path).gsub("$skey", skey)
 
+unless script_path.include?("curl -s")
+  script_body = script_body.gsub("curl", "curl -s")
+end
+
 puts "-------------------------"
 puts "[Command]\n"
 script_body.lines.each do |line|
@@ -45,4 +49,7 @@ script_body.lines.each do |line|
 end
 puts "-------------------------"
 
-system script_body
+shell_execution_result = `#{script_body}`
+
+response_params = 
+puts shell_execution_result

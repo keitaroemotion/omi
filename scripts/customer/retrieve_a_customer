@@ -1,0 +1,2 @@
+curl https://api.omise.co/customers/cust_test_4xtrb759599jsxlhkrb \
+  -u $skey 

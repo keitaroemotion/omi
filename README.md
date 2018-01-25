@@ -13,9 +13,9 @@ $ bundle install
 
 This file is the real example to demonstrate how to embed Omise.js to collect cards of your customers.
 
-## api_caller
+## omi
 
-api_caller does call Omise Api. Initially you need to go to [Omise Dashboard](https://dashboard.omise.co/test/keys) and copy its public | private key starts from `pkey_` `skey_`
+omi does call Omise Api. Initially you need to go to [Omise Dashboard](https://dashboard.omise.co/test/keys) and copy its public | private key starts from `pkey_` `skey_`
 
 then touch the file name `config` and edit as follows:
 
@@ -27,7 +27,7 @@ pkey=[your public key on Omise Dashboard]
 after that, please do the following:
 
 ```
-$./api_caller scripts/[api]/[api_to_call]
+$./omi scripts/[api]/[api_to_call]
 ```
 
 ## monogatari

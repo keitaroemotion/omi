@@ -1,4 +1,4 @@
-# Omise Sugoi
+# Omi
 
 This repository is the easy demo tool of Omise API and tutorial how to use Omise.js
 

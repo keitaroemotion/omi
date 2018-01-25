@@ -130,8 +130,7 @@ def api
     api.first
 end
 
-def translate_customer(key)
-    key = key.to_sym
+def translate_customer
     {
         destroy:   "destroy_a_customer",
         create_wc: "create_a_customer_and_attach_a_card",
@@ -140,29 +139,26 @@ def translate_customer(key)
         list_all:  "list_all_customers",
         get:       "retrieve_a_customer",
         update:    "update_a_customer",
-    }[key]
+    }
 end
 
-def translate_token(key)
-    key = key.to_sym
+def translate_token
     {
         create: "create_a_token", 
         get:    "retrieve_a_token",
-    }[key]
+    }
 end
 
-def translate_card(key)
-    key = key.to_sym
+def translate_card
     {
         destroy:  "destroy_a_card",
         list_all: "list_all_cards",
         get:      "retrieve_a_card",
         update:   "update_a_card",
-    }[key]
+    }
 end
 
-def translate_charge(key)
-    key = key.to_sym
+def translate_charge
     {
         list_all: "list_all_charges",
         update:   "update_a_charge", 
@@ -174,11 +170,10 @@ def translate_charge(key)
         wcc:      "charge_a_card_using_a_customer_and_a_card",
         wc:       "charge_a_card_using_a_customer",
         capture:  "capture_an_authorized_charge",
-    }[key]
+    }
 end
 
-def translate_dispute(key)
-    key = key.to_sym
+def translate_dispute
     {
         list_all: "list_all_disputes",
         lao:      "list_all_open_disputes",
@@ -186,38 +181,27 @@ def translate_dispute(key)
         lac:      "list_all_closed_disputes",
         get:      "retrieve_a_dispute",
         update:   "update_a_dispute",
-    }[key]
+    }
 end
 
-def translate_refund(key)
-    key = key.to_sym
+def translate_refund
     {
         list_all: "list_all_refunds",
         lap:      "list_all_refunds_of_particular_charge",
         get:      "retrieve_a_refund",
         create:   "create_a_refund",
-    }[key]
+    }
 end
 
 def translate(api, key)
-    key ||= ""
-    result = nil
-    case api
-    when "charge"
-        result = translate_charge(key)
-    when "card"   
-        result = translate_card(key)
-    when "customer"    
-        result = translate_customer(key)
-    when "token"    
-        result = translate_token(key)
-    when "dispute"    
-        result = translate_dispute(key)
-    when "refund"    
-        result = translate_refund(key)
-    else
-        abort("nope.you need to add translation")
-    end
+    result = {
+        charge:  translate_charge,
+        card:    translate_card,
+        cutomer: translate_customer,
+        token:   translate_token,
+        dispute: translate_dispute,
+        refund:  translate_refund,
+    }[api.to_sym][key.to_sym]
     help(api) unless result
     result
 end

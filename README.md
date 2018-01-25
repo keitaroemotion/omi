@@ -30,14 +30,6 @@ after that, please do the following:
 $./omi scripts/[api]/[api_to_call]
 ```
 
-## monogatari
-
-This script allows you to demo the various scenarios without messing around with which API to use and which order. Just watch the sample story:
-
-```
-$ ./monogatari
-```
-
 ## preparing the test environment
 
 1. execute the following script and obey the instructions

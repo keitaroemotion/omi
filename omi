@@ -57,10 +57,18 @@ def help(key=nil)
         "omi [customer] list_all  ... list_all_customers",
         "omi [customer] get       ... retrieve_a_customer",
         "omi [customer] update    ... update_a_customer",
-        "omi [dispute ] [key_word]",
-        "omi [refund  ] [key_word]", 
-        "omi [token   ] create   ... create a token", 
-        "omi [token   ] get      ... retrieve a token", 
+        "omi [dispute ] list_all  ... list_all_disputes",
+        "omi [dispute ] lao       ... list_all_open_disputes",
+        "omi [dispute ] lap       ... list_all_pending_disputes",
+        "omi [dispute ] lac       ... list_all_closed_disputes",
+        "omi [dispute ] get       ... retrieve_a_dispute",
+        "omi [dispute ] update    ... update_a_dispute",
+        "omi [refund  ] create    ... create_a_refund",
+        "omi [refund  ] list_all  ... list_all_refunds",
+        "omi [refund  ] lap       ... list_all_refunds_of_particular_charge",
+        "omi [refund  ] get       ... retrieve_a_refund",
+        "omi [token   ] create    ... create a token", 
+        "omi [token   ] get       ... retrieve a token", 
         "omi [edit    ] [api_name] [key_word]",
     ]
     if key
@@ -164,6 +172,28 @@ def translate_charge(key)
     }[key]
 end
 
+def translate_dispute(key)
+    key = key.to_sym
+    {
+        list_all: "list_all_disputes",
+        lao:      "list_all_open_disputes",
+        lap:      "list_all_pending_disputes",
+        lac:      "list_all_closed_disputes",
+        get:      "retrieve_a_dispute",
+        update:   "update_a_dispute",
+    }[key]
+end
+
+def translate_refund(key)
+    key = key.to_sym
+    {
+        list_all: "list_all_refunds",
+        lap:      "list_all_refunds_of_particular_charge",
+        get:      "retrieve_a_refund",
+        create:   "create_a_refund",
+    }[key]
+end
+
 def translate(api, key)
     key ||= ""
     result = nil
@@ -176,8 +206,12 @@ def translate(api, key)
         result = translate_customer(key)
     when "token"    
         result = translate_token(key)
+    when "dispute"    
+        result = translate_dispute(key)
+    when "refund"    
+        result = translate_refund(key)
     else
-        abort("nope. you need to add translation")
+        abort("nope.you need to add translation")
     end
     help(api) unless result
     result

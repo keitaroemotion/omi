@@ -1,0 +1,1 @@
+lsof -n -i:3000 | grep LISTEN

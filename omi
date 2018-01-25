@@ -15,17 +15,53 @@
 
 require "colorize"
 
-def help
-    puts "\napi_caller scripts/*\n\n"
+APIS = %w(card charge customer dispute refund token edit)
+RESOURCES   = "/usr/local/etc/omi"
+SCRIPTS     = "#{RESOURCES}/scripts"
+CONFIG_PATH = "#{RESOURCES}/config"
+
+def help(key=nil)
+    key = ARGV[1] unless key
+    if key == "apis"
+      puts
+      APIS.each {|a| puts a}
+      puts
+      abort
+    end
+    list = [
+        "omi card     [key_word]",
+        "omi charge   list_all       .... list all charges",
+        "omi charge   update         .... update all charges", 
+        "omi charge   list_all  list_all_charges",
+        "omi charge   update    update_a_charge" ,
+        "omi charge   reverse   reverse_an_uncaptured_charge",
+        "omi charge   get       retrieve_a_charge",
+        "omi charge   coib      create_an_offsite_internet_banking_charge",
+        "omi charge   coa       create_an_offsite_alipay_charge",
+        "omi charge   wt        charge_a_card_using_a_token",
+        "omi charge   wcc       charge_a_card_using_a_customer_and_a_card",
+        "omi charge   wc        charge_a_card_using_a_customer",
+        "omi charge   capture   capture_an_authorized_charge",
+        "omi customer [key_word]", 
+        "omi dispute  [key_word]",
+        "omi refund   [key_word]", 
+        "omi token    add  [key_word] .... create a token", 
+        "omi token    get  [key_word] .... retrieve a token", 
+        "omi edit     [api_name] [key_word]",
+    ]
+    if key
+      list = list.select{|x| x.include?("omi #{key}") }
+    end
+    puts
+    list.each {|x| puts x}
+    puts
     abort
 end
 
-if ARGV[0] == "-h"
+if %w(help --h -h).include?(ARGV[0])
     help
 end
 
-script_path = ARGV[0]
-CONFIG_PATH = "config"
 HAS_EQUAL   = /^.+\=.+$/
 
 def get_options
@@ -38,9 +74,7 @@ end
 
 options = get_options
 
-abort "script path is missing"              unless script_path
-abort "file does not exist: #{script_path}" unless File.exist?(script_path)
-abort "config file missing"                 unless File.exist?(CONFIG_PATH)
+abort "config file missing" unless File.exist?(CONFIG_PATH)
 
 def config
     lines = File
@@ -54,6 +88,55 @@ end
 config_hash = Hash[*(config)]
 skey        = config_hash["skey"]
 pkey        = config_hash["pkey"]
+
+def args
+    ARGV.select {|a| /^[^\=]+$/ =~ a  && !APIS.include?(a) }
+end
+
+def options
+    ARGV.select {|a| /^.+[\=]+.+$/ =~ a }
+end
+
+def api 
+    api = ARGV.select {|a| APIS.include?(a.strip) }
+    abort("api missing") unless api.size > 0
+    api.first
+end
+
+def translate_charge(key)
+    key = key.to_sym
+    {
+        list_all: "list_all_charges",
+        update:   "update_a_charge", 
+        reverse:  "reverse_an_uncaptured_charge",
+        get:      "retrieve_a_charge",
+        coib:     "create_an_offsite_internet_banking_charge",
+        coa:      "create_an_offsite_alipay_charge",
+        wt:       "charge_a_card_using_a_token",
+        wcc:      "charge_a_card_using_a_customer_and_a_card",
+        wc:       "charge_a_card_using_a_customer",
+        capture:  "capture_an_authorized_charge",
+    }[key]
+end
+
+def translate(api, key)
+    key ||= ""
+    result = nil
+    case api
+    when "charge"
+        result = translate_charge(key)
+    else
+        abort("nope")
+    end
+    help(api) unless result
+    result
+end
+
+def get_script_path(key)
+    "#{SCRIPTS}/#{api}/#{translate(api, key)}"
+end
+
+script_path = get_script_path(args.first)
 script_body = File.read(script_path).gsub("$skey", skey).gsub("$pkey", pkey)
 
 def substitute(key, script_body, options, config)

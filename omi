@@ -13,6 +13,11 @@
 #
 # XXX might need to make this application installable  
 
+
+#
+# XXX omi card destroy => authentication failure
+#
+
 require "colorize"
 
 APIS = %w(card charge customer dispute refund token edit)
@@ -29,28 +34,34 @@ def help(key=nil)
       abort
     end
     list = [
-        "omi card     [key_word]",
-        "omi charge   list_all       .... list all charges",
-        "omi charge   update         .... update all charges", 
-        "omi charge   list_all  list_all_charges",
-        "omi charge   update    update_a_charge" ,
-        "omi charge   reverse   reverse_an_uncaptured_charge",
-        "omi charge   get       retrieve_a_charge",
-        "omi charge   coib      create_an_offsite_internet_banking_charge",
-        "omi charge   coa       create_an_offsite_alipay_charge",
-        "omi charge   wt        charge_a_card_using_a_token",
-        "omi charge   wcc       charge_a_card_using_a_customer_and_a_card",
-        "omi charge   wc        charge_a_card_using_a_customer",
-        "omi charge   capture   capture_an_authorized_charge",
-        "omi customer [key_word]", 
-        "omi dispute  [key_word]",
-        "omi refund   [key_word]", 
-        "omi token    add  [key_word] .... create a token", 
-        "omi token    get  [key_word] .... retrieve a token", 
-        "omi edit     [api_name] [key_word]",
+        "omi [card    ] destroy   ... destroy a card",
+        "omi [charge  ] list_all  ... list all charges",
+        "omi [charge  ] update    ... update all charges", 
+        "omi [charge  ] list_all  ... list_all_charges",
+        "omi [charge  ] update    ... update_a_charge" ,
+        "omi [charge  ] reverse   ... reverse_an_uncaptured_charge",
+        "omi [charge  ] get       ... retrieve_a_charge",
+        "omi [charge  ] coib      ... create_an_offsite_internet_banking_charge",
+        "omi [charge  ] coa       ... create_an_offsite_alipay_charge",
+        "omi [charge  ] wt        ... charge_a_card_using_a_token",
+        "omi [charge  ] wcc       ... charge_a_card_using_a_customer_and_a_card",
+        "omi [charge  ] wc        ... charge_a_card_using_a_customer",
+        "omi [charge  ] capture   ... capture_an_authorized_charge",
+        "omi [customer] destroy   ... destory a customer", 
+        "omi [customer] create_wc ... create_a_customer_and_attach_a_card",
+        "omi [customer] create    ... create_a_customer",
+        "omi [customer] add_card  ... attach_a_card_to_customer",
+        "omi [customer] list_all  ... list_all_customers",
+        "omi [customer] get       ... retrieve_a_customer",
+        "omi [customer] update    ... update_a_customer",
+        "omi [dispute ] [key_word]",
+        "omi [refund  ] [key_word]", 
+        "omi [token   ] create   ... create a token", 
+        "omi [token   ] get      ... retrieve a token", 
+        "omi [edit    ] [api_name] [key_word]",
     ]
     if key
-      list = list.select{|x| x.include?("omi #{key}") }
+      list = list.select{|x| x.include?("omi [#{key}") }
     end
     puts
     list.each {|x| puts x}
@@ -103,6 +114,37 @@ def api
     api.first
 end
 
+def translate_customer(key)
+    key = key.to_sym
+    {
+        destroy:   "destroy_a_customer",
+        create_wc: "create_a_customer_and_attach_a_card",
+        create:    "create_a_customer",
+        add_card:  "attach_a_card_to_customer",
+        list_all:  "list_all_customers",
+        get:       "retrieve_a_customer",
+        update:    "update_a_customer",
+    }[key]
+end
+
+def translate_token(key)
+    key = key.to_sym
+    {
+        create: "create_a_token", 
+        get:    "retrieve_a_token",
+    }[key]
+end
+
+def translate_card(key)
+    key = key.to_sym
+    {
+        destroy:  "destroy_a_card",
+        list_all: "list_all_cards",
+        get:      "retrieve_a_card",
+        update:   "update_a_card",
+    }[key]
+end
+
 def translate_charge(key)
     key = key.to_sym
     {
@@ -125,8 +167,14 @@ def translate(api, key)
     case api
     when "charge"
         result = translate_charge(key)
+    when "card"   
+        result = translate_card(key)
+    when "customer"    
+        result = translate_customer(key)
+    when "token"    
+        result = translate_token(key)
     else
-        abort("nope")
+        abort("nope. you need to add translation")
     end
     help(api) unless result
     result
@@ -139,7 +187,7 @@ end
 script_path = get_script_path(args.first)
 script_body = File.read(script_path).gsub("$skey", skey).gsub("$pkey", pkey)
 
-def substitute(key, script_body, options, config)
+def gsub(key, script_body, options, config)
     if script_body.include?("$#{key}")
         if options[key]
             script_body = script_body.gsub("$#{key}", options[key])  
@@ -152,10 +200,16 @@ def substitute(key, script_body, options, config)
     script_body
 end        
 
-def list_values_and_substitute(script_body, skey, api, prefix, options)
+def list_values_and_gsub(script_body, skey, api, prefix, options, value="")
     if script_body.include?("$#{api}") 
        puts
-       list = `curl -s -X GET https://api.omise.co/#{api}s -u #{skey}:`
+       cmd = "curl -s -X GET https://api.omise.co/#{api}s -u #{skey}:"
+       if api == "card"
+           puts api
+           cmd = "curl -s -X GET https://api.omise.co/customers/#{value}/cards"
+       end
+       puts cmd.cyan
+       list = `#{cmd}`
            .split("\n")
            .select { |a| a.include?(prefix) }
            .map    { |a| /#{prefix}[a-z0-9_]+/.match(a).to_s.strip }
@@ -163,6 +217,9 @@ def list_values_and_substitute(script_body, skey, api, prefix, options)
        if api == "customer" && options["customer"]
            value = options["customer"]
        else
+           if list.size == 0
+             abort "no #{api}s found"
+           end
            list.each_with_index { |e, i| 
                puts "[#{i}] #{e}"
            }
@@ -172,15 +229,17 @@ def list_values_and_substitute(script_body, skey, api, prefix, options)
        end    
        script_body = script_body.gsub("$#{api}", value)
     end
-    script_body
+    [script_body, value]
 end
 
-script_body = substitute("charge", script_body, options, config_hash)
-script_body = substitute("token", script_body, options, config_hash)
-script_body = substitute("dispute", script_body, options, config_hash)
-script_body = substitute("amount", script_body, options, config_hash)
-script_body = list_values_and_substitute(script_body, skey, "customer", "cust_", options)
-script_body = list_values_and_substitute(script_body, skey, "charge", "chrg_", options)
+
+script_body = gsub("charge", script_body, options, config_hash)
+script_body = gsub("token", script_body, options, config_hash)
+script_body = gsub("dispute", script_body, options, config_hash)
+script_body = gsub("amount", script_body, options, config_hash)
+script_body, value = list_values_and_gsub(script_body, skey, "customer", "cust_", options)
+script_body, value = list_values_and_gsub(script_body, skey, "charge", "chrg_", options, value)
+script_body, value = list_values_and_gsub(script_body, skey, "card", "card_", options, value)
 
 unless script_path.include?("curl -s")
     script_body = script_body.gsub("curl", "curl -s")

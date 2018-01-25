@@ -194,14 +194,16 @@ def translate_refund
 end
 
 def translate(api, key)
-    result = {
-        charge:  translate_charge,
-        card:    translate_card,
-        cutomer: translate_customer,
-        token:   translate_token,
-        dispute: translate_dispute,
-        refund:  translate_refund,
-    }[api.to_sym][key.to_sym]
+    api_translation = {
+        charge:   translate_charge,
+        card:     translate_card,
+        customer: translate_customer,
+        token:    translate_token,
+        dispute:  translate_dispute,
+        refund:   translate_refund,
+    }[api.to_sym]
+    abort "api missing" unless api_translation 
+    result = api_translation[(key || "").to_sym]
     help(api) unless result
     result
 end

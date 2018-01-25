@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby
+
+omw = "cd omise-webhook;"
+here = "cd test_env;"
+
+commands = [
+  "#{omw}git clone https://github.com/akinrt/omise-webhook.git",
+  "#{omw}gem install bundler",
+  "#{omw}bundle install --path vendor/bundle",
+  "brew cask install ngrok",
+  "echo \"find your skey in Omise Dashboard and copy it (https://dashboard.omise.co/test/keys)\"", 
+  "cp .env omise-webhook; #{omw} vim .env",
+  "#{omw}echo \"Please execute ./launch\";bundle exec ruby app.rb",
+]  
+
+commands.each do |command|
+  print "[#{command}][Y/n] ".gsub(omw, "")
+  input = $stdin.gets.chomp
+  if input.downcase == "y"
+    system "#{here}#{command}"
+  end
+end

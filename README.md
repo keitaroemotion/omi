@@ -38,5 +38,27 @@ This script allows you to demo the various scenarios without messing around with
 $ ./monogatari
 ```
 
+## preparing the test environment
+
+1. execute the following script and obey the instructions
+
+```
+$ ./test_env/prepare
+```
+2. after 1. has been started, execute the following:
+
+```
+$ ./test_env/launch
+```
+
+3. then you have to go to (https://dashboard.omise.co/test/webhooks) and edit the endpoint such as:
+
+```
+https://[random hash].ngrok.io/omise/webhook
+```
+
+4. after that, you are going to execute whatever API command as you like.
+
+
 ## Special Thanks
 Thanks to Mr. Akira Narita, it is possible to test the Omise Webhook API with his [omise-webhook](http://akinrt.hatenablog.com/entry/omise-webhook) module. If you quickly want to test Omise-Webhook API without launching SSL/TLS certificate enhancing https website, his repository helps you.

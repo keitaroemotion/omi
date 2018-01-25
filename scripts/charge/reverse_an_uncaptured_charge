@@ -1,3 +1,3 @@
-curl https://api.omise.co/charges/chrg_test_4xso2s8ivdej29pqnhz/reverse \
+curl https://api.omise.co/charges/$charge/reverse \
   -X POST \
   -u $skey

@@ -92,6 +92,7 @@ def list_values_and_substitute(script_body, skey, api, prefix, options)
     script_body
 end
 
+script_body = substitute("charge", script_body, options, config_hash)
 script_body = substitute("token", script_body, options, config_hash)
 script_body = substitute("dispute", script_body, options, config_hash)
 script_body = substitute("amount", script_body, options, config_hash)

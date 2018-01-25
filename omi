@@ -35,6 +35,9 @@ def help(key=nil)
     end
     list = [
         "omi [card    ] destroy   ... destroy a card",
+        "omi [card    ] list_all  ... list_all_cards",
+        "omi [card    ] get       ... retrieve_a_card",
+        "omi [card    ] update    ... update_a_card",
         "omi [charge  ] list_all  ... list all charges",
         "omi [charge  ] update    ... update all charges", 
         "omi [charge  ] list_all  ... list_all_charges",
@@ -232,7 +235,9 @@ def list_values_and_gsub(script_body, skey, api, prefix, options, value="")
     [script_body, value]
 end
 
-
+#
+# XXX need this to be refactored as iteration
+#
 script_body = gsub("charge", script_body, options, config_hash)
 script_body = gsub("token", script_body, options, config_hash)
 script_body = gsub("dispute", script_body, options, config_hash)

@@ -28,10 +28,10 @@ CONFIG_PATH = "#{RESOURCES}/config"
 def help(key=nil)
     key = ARGV[1] unless key
     if key == "apis"
-      puts
-      APIS.each {|a| puts a}
-      puts
-      abort
+        puts
+        APIS.each {|a| puts a}
+        puts
+        abort
     end
     list = [
         "omi [card    ] destroy   ... destroy a card",
@@ -83,7 +83,6 @@ end
 if %w(help --h -h).include?(ARGV[0])
     help
 end
-
 HAS_EQUAL   = /^.+\=.+$/
 
 def get_options
@@ -92,6 +91,10 @@ def get_options
         .map    { |a| a.split('=').map(&:to_s) }
         .flatten
     Hash[*list]  
+end
+
+def vim?
+    ARGV.include?("--vim") || ARGV.include?("-v")
 end
 
 options = get_options
@@ -121,7 +124,9 @@ end
 
 def api 
     api = ARGV.select {|a| APIS.include?(a.strip) }
-    abort("api missing") unless api.size > 0
+    unless api.size > 0
+        abort("\napi missing. please input any of the following:  \n\n#{APIS}\n\n")
+    end
     api.first
 end
 
@@ -284,20 +289,32 @@ unless script_path.include?("curl -s")
     script_body = script_body.gsub("curl", "curl -s")
 end
 
-puts "-------------------------"
-puts "[Command]\n"
-puts script_body.lines.select { |line| !(line.start_with?("#")) }.join.chomp.green
-puts "-------------------------"
+command = script_body.lines.select { |line| !(line.start_with?("#")) }.join.chomp
 
-shell_execution_result = `#{script_body}`
-puts shell_execution_result
+if vim?
+   result           = `#{script_body}`
+   sentence         = "#{command.strip}\n\n#{result}"
+   result_file_name = "curl_result.tmp"
+   File.open(result_file_name, "w") do |f|
+       f.puts sentence
+   end
+   system "vim #{result_file_name}"
+else
+    puts "-------------------------"
+    puts "[Command]\n"
+    puts command.green
+    puts "-------------------------"
 
-if File.basename(script_path) == "create_a_token"
-    token = shell_execution_result
-        .split("\n")
-        .select{ |a| a.include?("tokn_")             }
-        .map   { |a| /tokn_[a-z0-9_]+/.match(a).to_s }
-        .flatten
-        .uniq
-    `echo token=#{token.first} | pbcopy`    
-end
+    shell_execution_result = `#{script_body}`
+    puts shell_execution_result
+
+    if File.basename(script_path) == "create_a_token"
+        token = shell_execution_result
+            .split("\n")
+            .select{ |a| a.include?("tokn_")             }
+            .map   { |a| /tokn_[a-z0-9_]+/.match(a).to_s }
+            .flatten
+            .uniq
+        `echo token=#{token.first} | pbcopy`    
+    end
+end    

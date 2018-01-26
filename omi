@@ -75,6 +75,8 @@ def help(key=nil)
       list = list.select{|x| x.include?("omi [#{key}") }
     end
     puts
+    puts "option: -e allows editing the command before execution"
+    puts "option: -v allows viewing the execution result"
     list.each {|x| puts x}
     puts
     abort

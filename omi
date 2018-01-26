@@ -20,7 +20,7 @@
 
 require "colorize"
 
-APIS = %w(card charge customer dispute refund token edit)
+APIS = %w(card charge customer dispute refund token edit recipient transfer)
 RESOURCES   = "/usr/local/etc/omi"
 SCRIPTS     = "#{RESOURCES}/scripts"
 CONFIG_PATH = "#{RESOURCES}/config"
@@ -34,33 +34,38 @@ def help(key=nil)
         abort
     end
     list = [
-        "omi [card    ] destroy   ... destroy a card",
-        "omi [card    ] list      ... list_all_cards",
-        "omi [card    ] get       ... retrieve_a_card",
-        "omi [card    ] update    ... update_a_card",
-        "omi [charge  ] list      ... list all charges",
-        "omi [charge  ] update    ... update_a_charge" ,
-        "omi [charge  ] reverse   ... reverse_an_uncaptured_charge",
-        "omi [charge  ] get       ... retrieve_a_charge",
-        "omi [charge  ] coib      ... create_an_offsite_internet_banking_charge",
-        "omi [charge  ] coa       ... create_an_offsite_alipay_charge",
-        "omi [charge  ] wt        ... charge_a_card_using_a_token",
-        "omi [charge  ] wcc       ... charge_a_card_using_a_customer_and_a_card",
-        "omi [charge  ] wc        ... charge_a_card_using_a_customer",
-        "omi [charge  ] capture   ... capture_an_authorized_charge",
-        "omi [customer] destroy   ... destory a customer", 
-        "omi [customer] create_wc ... create_a_customer_and_attach_a_card",
-        "omi [customer] create    ... create_a_customer",
-        "omi [customer] add_card  ... attach_a_card_to_customer",
-        "omi [customer] list      ... list_all_customers",
-        "omi [customer] get       ... retrieve_a_customer",
-        "omi [customer] update    ... update_a_customer",
-        "omi [dispute ] list      ... list_all_disputes",
-        "omi [dispute ] lao       ... list_all_open_disputes",
-        "omi [dispute ] lap       ... list_all_pending_disputes",
-        "omi [dispute ] lac       ... list_all_closed_disputes",
-        "omi [dispute ] get       ... retrieve_a_dispute",
-        "omi [dispute ] update    ... update_a_dispute",
+        "omi [card    ]  destroy   ... destroy a card",
+        "omi [card    ]  list      ... list_all_cards",
+        "omi [card    ]  get       ... retrieve_a_card",
+        "omi [card    ]  update    ... update_a_card",
+        "omi [charge  ]  list      ... list all charges",
+        "omi [charge  ]  update    ... update_a_charge" ,
+        "omi [charge  ]  reverse   ... reverse_an_uncaptured_charge",
+        "omi [charge  ]  get       ... retrieve_a_charge",
+        "omi [charge  ]  coib      ... create_an_offsite_internet_banking_charge",
+        "omi [charge  ]  coa       ... create_an_offsite_alipay_charge",
+        "omi [charge  ]  wt        ... charge_a_card_using_a_token",
+        "omi [charge  ]  wcc       ... charge_a_card_using_a_customer_and_a_card",
+        "omi [charge  ]  wc        ... charge_a_card_using_a_customer",
+        "omi [charge  ]  capture   ... capture_an_authorized_charge",
+        "omi [customer]  destroy   ... destory a customer", 
+        "omi [customer]  create_wc ... create_a_customer_and_attach_a_card",
+        "omi [customer]  create    ... create_a_customer",
+        "omi [customer]  add_card  ... attach_a_card_to_customer",
+        "omi [customer]  list      ... list_all_customers",
+        "omi [customer]  get       ... retrieve_a_customer",
+        "omi [customer]  update    ... update_a_customer",
+        "omi [dispute ]  list      ... list_all_disputes",
+        "omi [dispute ]  lao       ... list_all_open_disputes",
+        "omi [dispute ]  lap       ... list_all_pending_disputes",
+        "omi [dispute ]  lac       ... list_all_closed_disputes",
+        "omi [dispute ]  get       ... retrieve_a_dispute",
+        "omi [dispute ]  update    ... update_a_dispute",
+        "omi [recipient] list      ... list_all_recipient",
+        "omi [recipient] create    ... create_a_recipient",
+        "omi [recipient] get       ... retrieve_a_recipient",
+        "omi [recipient] update    ... update_a_recipient",
+        "omi [recipient] destroy   ... destroy_a_recipient" ,
         "omi [refund  ] create    ... create_a_refund",
         "omi [refund  ] list      ... list_all_refunds",
         "omi [refund  ] lap       ... list_all_refunds_of_particular_charge",
@@ -188,6 +193,16 @@ def translate_dispute
     }
 end
 
+def translate_recipient
+    {
+        list:    "list_all_recipient",
+        create:  "create_a_recipient",
+        get:     "retrieve_a_recipient",
+        update:  "update_a_recipient",
+        destroy: "destroy_a_recipient" 
+    }
+end
+
 def translate_refund
     {
         list:     "list_all_refunds",
@@ -200,12 +215,13 @@ end
 
 def translate(api, key)
     api_translation = {
-        charge:   translate_charge,
-        card:     translate_card,
-        customer: translate_customer,
-        token:    translate_token,
-        dispute:  translate_dispute,
-        refund:   translate_refund,
+        charge:    translate_charge,
+        card:      translate_card,
+        customer:  translate_customer,
+        token:     translate_token,
+        dispute:   translate_dispute,
+        refund:    translate_refund,
+        recipient: translate_recipient
     }[api.to_sym]
     abort "api missing" unless api_translation 
     result = api_translation[(key || "").to_sym]
@@ -269,6 +285,8 @@ end
 #
 # XXX need this to be refactored as iteration
 #
+script_body = gsub("transfer", script_body, options, config_hash)
+script_body = gsub("recipient", script_body, options, config_hash)
 script_body = gsub("charge", script_body, options, config_hash)
 script_body = gsub("token", script_body, options, config_hash)
 script_body = gsub("dispute", script_body, options, config_hash)

@@ -1,0 +1,6 @@
+curl https://api.omise.co/recipients/$recipient \
+  -X PATCH \
+  -u $skey \
+  -d "name=John Smith" \
+  -d "email=john.smith@example.com" \
+  -d "bank_account[number]=acc123456789"

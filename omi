@@ -39,8 +39,6 @@ def help(key=nil)
         "omi [card    ] get       ... retrieve_a_card",
         "omi [card    ] update    ... update_a_card",
         "omi [charge  ] list      ... list all charges",
-        "omi [charge  ] update    ... update all charges", 
-        "omi [charge  ] list      ... list_all_charges",
         "omi [charge  ] update    ... update_a_charge" ,
         "omi [charge  ] reverse   ... reverse_an_uncaptured_charge",
         "omi [charge  ] get       ... retrieve_a_charge",

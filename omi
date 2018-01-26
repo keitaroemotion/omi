@@ -48,7 +48,7 @@ def help(key=nil)
         "omi [charge  ]  wcc       ... charge_a_card_using_a_customer_and_a_card",
         "omi [charge  ]  wc        ... charge_a_card_using_a_customer",
         "omi [charge  ]  capture   ... capture_an_authorized_charge",
-        "omi [customer]  destroy   ... destory a customer", 
+        "omi [customer]  destroy   ... destroy a customer", 
         "omi [customer]  create_wc ... create_a_customer_and_attach_a_card",
         "omi [customer]  create    ... create_a_customer",
         "omi [customer]  add_card  ... attach_a_card_to_customer",
@@ -72,6 +72,12 @@ def help(key=nil)
         "omi [refund  ] get       ... retrieve_a_refund",
         "omi [token   ] create    ... create a token", 
         "omi [token   ] get       ... retrieve a token", 
+        "omi [transfer] create    ... create_a_transfer",
+        "omi [transfer] cr3       ... create_a_transfer_to_third_party_recipient",
+        "omi [transfer] destroy   ... destroy_a_transfer",
+        "omi [transfer] list      ... list_all_transfers",
+        "omi [transfer] get       ... retrieve_a_transfer",
+        "omi [transfer] update    ... update_a_transfer",
         "omi [edit    ] [api_name] [key_word]",
     ]
     if key
@@ -213,6 +219,17 @@ def translate_refund
     }
 end
 
+def translate_transfer
+    {
+        create:   "create_a_transfer",
+        cr3:      "create_a_transfer_to_third_party_recipient",
+        destroy:  "destroy_a_transfer",
+        list:     "list_all_transfers",
+        get:      "retrieve_a_transfer",
+        update:   "update_a_transfer",
+    }
+end
+
 def translate(api, key)
     api_translation = {
         charge:    translate_charge,
@@ -221,7 +238,8 @@ def translate(api, key)
         token:     translate_token,
         dispute:   translate_dispute,
         refund:    translate_refund,
-        recipient: translate_recipient
+        recipient: translate_recipient,
+        transfer:  translate_transfer
     }[api.to_sym]
     abort "api missing" unless api_translation 
     result = api_translation[(key || "").to_sym]

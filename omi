@@ -35,12 +35,12 @@ def help(key=nil)
     end
     list = [
         "omi [card    ] destroy   ... destroy a card",
-        "omi [card    ] list_all  ... list_all_cards",
+        "omi [card    ] list      ... list_all_cards",
         "omi [card    ] get       ... retrieve_a_card",
         "omi [card    ] update    ... update_a_card",
-        "omi [charge  ] list_all  ... list all charges",
+        "omi [charge  ] list      ... list all charges",
         "omi [charge  ] update    ... update all charges", 
-        "omi [charge  ] list_all  ... list_all_charges",
+        "omi [charge  ] list      ... list_all_charges",
         "omi [charge  ] update    ... update_a_charge" ,
         "omi [charge  ] reverse   ... reverse_an_uncaptured_charge",
         "omi [charge  ] get       ... retrieve_a_charge",
@@ -54,17 +54,17 @@ def help(key=nil)
         "omi [customer] create_wc ... create_a_customer_and_attach_a_card",
         "omi [customer] create    ... create_a_customer",
         "omi [customer] add_card  ... attach_a_card_to_customer",
-        "omi [customer] list_all  ... list_all_customers",
+        "omi [customer] list      ... list_all_customers",
         "omi [customer] get       ... retrieve_a_customer",
         "omi [customer] update    ... update_a_customer",
-        "omi [dispute ] list_all  ... list_all_disputes",
+        "omi [dispute ] list      ... list_all_disputes",
         "omi [dispute ] lao       ... list_all_open_disputes",
         "omi [dispute ] lap       ... list_all_pending_disputes",
         "omi [dispute ] lac       ... list_all_closed_disputes",
         "omi [dispute ] get       ... retrieve_a_dispute",
         "omi [dispute ] update    ... update_a_dispute",
         "omi [refund  ] create    ... create_a_refund",
-        "omi [refund  ] list_all  ... list_all_refunds",
+        "omi [refund  ] list      ... list_all_refunds",
         "omi [refund  ] lap       ... list_all_refunds_of_particular_charge",
         "omi [refund  ] get       ... retrieve_a_refund",
         "omi [token   ] create    ... create a token", 
@@ -136,6 +136,7 @@ def translate_customer
         create_wc: "create_a_customer_and_attach_a_card",
         create:    "create_a_customer",
         add_card:  "attach_a_card_to_customer",
+        list:      "list_all_customers",
         list_all:  "list_all_customers",
         get:       "retrieve_a_customer",
         update:    "update_a_customer",
@@ -152,6 +153,7 @@ end
 def translate_card
     {
         destroy:  "destroy_a_card",
+        list:     "list_all_cards",
         list_all: "list_all_cards",
         get:      "retrieve_a_card",
         update:   "update_a_card",
@@ -160,6 +162,7 @@ end
 
 def translate_charge
     {
+        list:     "list_all_charges",
         list_all: "list_all_charges",
         update:   "update_a_charge", 
         reverse:  "reverse_an_uncaptured_charge",
@@ -175,6 +178,7 @@ end
 
 def translate_dispute
     {
+        list:     "list_all_disputes",
         list_all: "list_all_disputes",
         lao:      "list_all_open_disputes",
         lap:      "list_all_pending_disputes",
@@ -186,6 +190,7 @@ end
 
 def translate_refund
     {
+        list:     "list_all_refunds",
         list_all: "list_all_refunds",
         lap:      "list_all_refunds_of_particular_charge",
         get:      "retrieve_a_refund",
@@ -237,23 +242,22 @@ def list_values_and_gsub(script_body, skey, api, prefix, options, value="")
            cmd = "curl -s -X GET https://api.omise.co/customers/#{value}/cards"
        end
        puts cmd.cyan
-       list = `#{cmd}`
-           .split("\n")
-           .select { |a| a.include?(prefix) }
-           .map    { |a| /#{prefix}[a-z0-9_]+/.match(a).to_s.strip }
-           .uniq
+       result = `#{cmd}`
+       list = result
+                  .split("\n")
+                  .select { |a| a.include?(prefix) }
+                  .map    { |a| /#{prefix}[a-z0-9_]+/.match(a).to_s.strip }
+                  .uniq
        if api == "customer" && options["customer"]
            value = options["customer"]
        else
            if list.size == 0
-             abort "no #{api}s found"
+               puts result
+           else  
+               list.each_with_index { |e, i| puts "[#{i}] #{e}" }
+               print "\n[which?] "    
+               value = list[$stdin.gets.chomp.to_i]
            end
-           list.each_with_index { |e, i| 
-               puts "[#{i}] #{e}"
-           }
-           print "\n[which?] "    
-           input = $stdin.gets.chomp.to_i 
-           value = list[input]
        end    
        script_body = script_body.gsub("$#{api}", value)
     end
@@ -273,6 +277,18 @@ script_body, value = list_values_and_gsub(script_body, skey, "card", "card_", op
 
 unless script_path.include?("curl -s")
     script_body = script_body.gsub("curl", "curl -s")
+end
+
+def pre_edit?
+  ARGV.include?("-e")
+end
+
+if pre_edit?
+   tmp = ".tmp_file_omise"
+   File.open(tmp, "w") { |f| f.puts script_body }
+   system("vim #{tmp}")
+   script_body = File.read(tmp)
+   system("rm #{tmp}")
 end
 
 command = script_body.lines.select { |line| !(line.start_with?("#")) }.join.chomp

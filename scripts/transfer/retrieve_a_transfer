@@ -1,0 +1,3 @@
+curl https://api.omise.co/transfers/$transfer \
+  -X GET \
+  -u $skey

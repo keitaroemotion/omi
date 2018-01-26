@@ -1,0 +1,4 @@
+curl https://api.omise.co/transfers/$transfer \
+  -X PATCH \
+  -u $skey \
+  -d "amount=50"

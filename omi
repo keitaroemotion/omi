@@ -129,10 +129,16 @@ def args
     ARGV.select {|a| /^[^\=]+$/ =~ a  && !APIS.include?(a) }
 end
 
+#
+# extract the [key]=[value] pair from the ARGV
+# 
 def options
     ARGV.select {|a| /^.+[\=]+.+$/ =~ a }
 end
 
+#
+# extract the api optcode from the ARGV
+#
 def api 
     api = ARGV.select {|a| APIS.include?(a.strip) }
     unless api.size > 0
@@ -230,6 +236,11 @@ def translate_transfer
     }
 end
 
+#
+# Mapping function such as:
+#
+# [api_identifier] -> /[api_identifier]/[api_file_name under the script repository]
+#
 def translate(api, key)
     api_translation = {
         charge:    translate_charge,
@@ -254,6 +265,10 @@ end
 script_path = get_script_path(args.first)
 script_body = File.read(script_path).gsub("$skey", skey).gsub("$pkey", pkey)
 
+#
+# gsub the $[key] parameter in script file 
+# into the value of ARGV option [key]=[value]
+#
 def gsub(key, script_body, options, config)
     if script_body.include?("$#{key}")
         if options[key]
@@ -267,6 +282,13 @@ def gsub(key, script_body, options, config)
     script_body
 end        
 
+#
+# XXX needs to be refactored
+#
+# if specific parameter is missing, this script enlist the
+# existing values, then, let user choose the one,
+# and eventually this value is assigned to the main script_body
+#
 def list_values_and_gsub(script_body, skey, api, prefix, options, value="")
     if script_body.include?("$#{api}") 
        puts
@@ -321,6 +343,10 @@ def pre_edit?
   ARGV.include?("-e")
 end
 
+#
+# if the argument "-e" included in ARGV,
+# command can be edited with vim editor before its execution.
+#
 if pre_edit?
    tmp = ".tmp_file_omise"
    File.open(tmp, "w") { |f| f.puts script_body }
@@ -329,8 +355,14 @@ if pre_edit?
    system("rm #{tmp}")
 end
 
+#
+# remove commented lines from the script file
+#
 command = script_body.lines.select { |line| !(line.start_with?("#")) }.join.chomp
 
+#
+# this is the __main__ execution part
+#
 if vim?
    result           = `#{script_body}`
    sentence         = "#{command.strip}\n\n#{result}"

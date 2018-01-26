@@ -20,7 +20,7 @@
 
 require "colorize"
 
-APIS = %w(card charge customer dispute refund token edit recipient transfer)
+APIS = %w(card charge customer dispute refund token recipient transfer)
 RESOURCES   = "/usr/local/etc/omi"
 SCRIPTS     = "#{RESOURCES}/scripts"
 CONFIG_PATH = "#{RESOURCES}/config"

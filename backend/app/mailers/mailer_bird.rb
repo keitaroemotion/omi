@@ -1,0 +1,2 @@
+class MailerBird < ApplicationMailer
+end

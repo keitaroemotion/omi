@@ -1,0 +1,85 @@
+#!/usr/bin/env ruby
+
+#
+# Easy Mailer Sample Implementation
+# For the Gmail Sender, you need to update
+# Configuration to allow less secure apps turned ON:
+# [https://myaccount.google.com/lesssecureapps]
+#
+
+require 'mail'
+require 'io/console'
+
+def help
+  puts
+  puts "mailer [-h] ... help"
+  puts "mailer [-i] ... interactive password input"
+  puts
+end
+
+CONFIG_PATH = "config"
+
+def parse_config(config)
+  array = File.read(config).split("\n").map { |line|
+    line.split("=")      
+  }.flatten
+  Hash[*array]
+end
+
+
+def get_input(label)
+  print "#{label}: "
+  input = STDIN.noecho(&:gets).chomp
+  puts
+  input
+end
+
+def options
+  ARGV.select {|arg| arg.start_with?("-") }
+end
+
+def pass
+  if options.include?("-i")
+    get_input("pass")
+  else
+    "" # this pass must be retrieved from Secret File / Secret DB   
+  end
+end
+
+user_name = "testnansgomen"
+Mail.defaults do
+  delivery_method :smtp, {
+    address:              "smtp.gmail.com",
+    port:                 587,
+    domain:               "example.com", # this does not need to be changed
+    user_name:            user_name,
+    password:             pass,
+    authentication:       'plain',
+    enable_starttls_auto: true
+  }
+end
+
+def build_mail(sender_email_address, recipient_email_address, _subject, _body)
+  Mail.new do
+    from    sender_email_address
+    to      recipient_email_address 
+    subject _subject
+    body    _body
+  end
+end
+
+def send_email(target_addresses, sender_email_address)
+  target_addresses.each do |recipient_email_address| 
+    mail = build_mail(sender_email_address, recipient_email_address, "This is a Test", "This is a body")
+    mail.charset = "UTF-8"
+    mail.content_transfer_encoding = "8bit"
+    mail.deliver!
+  end
+rescue Net::SMTPAuthenticationError
+  abort("\nEmailAddress/Password is incorrect: #{sender_email_address}\n\n")
+end
+
+config_hash          = parse_config(CONFIG_PATH)
+sender_email_address = config_hash["sender_email_address"]
+target_addresses     = config_hash["default_target_addresses"].split(",")
+send_email(target_addresses, sender_email_address)

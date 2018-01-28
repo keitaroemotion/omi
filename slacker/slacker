@@ -2,6 +2,9 @@
 
 require 'slack-notifier'
 #
+# author: Kei Sugano <tobasojyo@gmail.com>
+#
+#
 # XXX send slack notification
 #
 # YOU NEED TO GENERATE WEBHOOK URL WITH THE FOLLOWING INSTRUCTION:

@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 
 #
+# author: Kei Sugano <tobasojyo@gmail.com>
+#
 # Easy Mailer Sample Implementation
 # For the Gmail Sender, you need to update
 # Configuration to allow less secure apps turned ON:

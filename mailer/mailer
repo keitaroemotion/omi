@@ -17,15 +17,31 @@ def help
   puts
 end
 
-CONFIG_PATH = "config"
+def guide_config(config)
+  unless File.exist?(config)
+    File.open(config, "w") do |f|
+      f.puts("sender_email_address=[email address]")
+      f.puts("pass=[password for the sender_email_address]")
+      f.puts("default_target_addresses=[target email addresses. if plural, it must be separated with comma. no space allowed]")
+    end
+    abort("\nYou need to edit file: #{config}\n\n")
+  end
+end
 
 def parse_config(config)
+  guide_config(CONFIG_PATH)
   array = File.read(config).split("\n").map { |line|
     line.split("=")      
   }.flatten
   Hash[*array]
 end
 
+CONFIG_PATH = "config"
+config_hash          = parse_config(CONFIG_PATH)
+sender_email_address = config_hash["sender_email_address"]
+target_addresses     = config_hash["default_target_addresses"].split(",")
+user_name            = /^[^@]+/.match(sender_email_address).to_s
+pass                 = config_hash["pass"]
 
 def get_input(label)
   print "#{label}: "
@@ -38,15 +54,16 @@ def options
   ARGV.select {|arg| arg.start_with?("-") }
 end
 
-def pass
+def pass(secret_hash)
   if options.include?("-i")
     get_input("pass")
-  else
-    "" # this pass must be retrieved from Secret File / Secret DB   
+  elsif(secret_hash["pass"])
+    secret_hash["pass"]   
+  else  
+    abort("NONE. You need to add password to config")
   end
 end
 
-user_name = "testnansgomen"
 Mail.defaults do
   delivery_method :smtp, {
     address:              "smtp.gmail.com",
@@ -79,7 +96,4 @@ rescue Net::SMTPAuthenticationError
   abort("\nEmailAddress/Password is incorrect: #{sender_email_address}\n\n")
 end
 
-config_hash          = parse_config(CONFIG_PATH)
-sender_email_address = config_hash["sender_email_address"]
-target_addresses     = config_hash["default_target_addresses"].split(",")
 send_email(target_addresses, sender_email_address)

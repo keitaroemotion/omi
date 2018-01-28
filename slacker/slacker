@@ -4,9 +4,6 @@ require 'slack-notifier'
 #
 # author: Kei Sugano <tobasojyo@gmail.com>
 #
-#
-# XXX send slack notification
-#
 # YOU NEED TO GENERATE WEBHOOK URL WITH THE FOLLOWING INSTRUCTION:
 # https://get.slack.help/hc/en-us/articles/115005265063-Incoming-WebHooks-for-Slack
 #
@@ -31,7 +28,6 @@ def parse_config(config)
 end
 
 config_hash = parse_config(CONFIG_PATH)
-
-notifier = Slack::Notifier.new(config_hash["webhook_url"]) 
-message  = "charge.created"
+notifier    = Slack::Notifier.new(config_hash["webhook_url"]) 
+message     = "charge.created"
 notifier.ping message

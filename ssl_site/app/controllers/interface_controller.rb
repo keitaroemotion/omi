@@ -6,9 +6,17 @@ class InterfaceController < ApplicationController
 
   def take
     archive    
+    send_email
+    send_slack
   end
 
   private
+
+  def send_email
+  end
+
+  def send_slack
+  end
 
   def archive
     File.open(".history", "a") do |f|

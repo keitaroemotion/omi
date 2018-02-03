@@ -1,0 +1,67 @@
+XXX enable suganokei.com to be routed to my domain
+XXX get SSL certificate(AWS)
+XXX launch HTTPS server
+XXX make ER
+XXX make PPT
+
+SSL/TLS use X.509 certificate
+- issued by certificate authority
+- contains...
+  - identification information
+  - validity period
+  - public key
+  - a serial number
+  - a digital signature of the issuer
+
+For the AWS..
+  - [X] AWS Certificate Manager /
+  - OpenSSL(tool that supports SSL/TLS protocols)
+
+  - Elastic Load Balancing
+
+how to enable https:
+  - [AWS]
+    - Get the domain [Route 53] name (usually it takes days)
+    - Then route its domain name to your EC2 instance
+      [https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-to-ec2-instance.html]
+    - Request a Certificate with the domain name 
+      [https://docs.aws.amazon.com/acm/latest/userguide/gs-acm-request.html]
+    - May you encounter with the "Pending" status, then you need additional documents.
+      [https://docs.aws.amazon.com/acm/latest/userguide/gs-acm-validate-dns.html]
+      - Add CNAME to Domain  
+
+  - Rails
+    config.force_ssl = true
+
+
+Let's Encrypt (https://letsencrypt.org/how-it-works/)
+  - Free Certificate Agent(CA)
+  - Domain Validation    
+    - identify server admin by public key
+
+    - [Providioning]
+      a. Provisioning a DNS record under example.com or
+      b. Provisioning an HTTP resource under a well-known URI on https://example.com
+    - [Nonce]  
+      Provides a nonce that agent must sign with its private key pair
+      to prove that it controls the key pair.  
+      - agent signs the nonce (with private key)
+      - CA verifies the nonce (with public key)
+  - Vertificate Issuance and Revocation      
+    - To obtain certificate for the domain, the agent constructs
+      - PKCS#10 Certificate Signing Request(CSR)
+      - [1] CSR includes a signature by the private key (corresponding to the public key in CSR)
+      - [2] The agent also signs the whole CSR with the authorized key for
+        example.com so that the CA knows it’s authorized
+      - When the CA receives the request, it verifies both signatures.
+      - If everything looks good, it issues a certificate for example.com
+        with the public key from the CSR and returns it to the agent
+      * Revocation Works in the Similar manner  
+   - ACME protocol   
+   - https://certbot.eff.org/#ubuntuxenial-other
+      
+
+APPENDIX:
+
+FQDN: https://kb.iu.edu/d/aiuv
+http://www5e.biglobe.ne.jp/%257eaji/3min/64.html

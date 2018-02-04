@@ -12,7 +12,7 @@ class EndpointController < ApplicationController
   # take the incoming POST request from Omise webhook server
   # and parse|filter is, then send to Email|Slack notification
   #
-  def take
+  def get_request
     send_email
     send_slack
   end
@@ -23,13 +23,13 @@ class EndpointController < ApplicationController
     url         = Rails.application.secrets.webhook_url
     notifier    = Slack::Notifier.new(url) 
     message     = build_notification_content
-    notifier.ping message
+    notifier.ping "\n#{message}\n"
   end
 
   def build_notification_content
-    data    = params["data"]
-    refunds = data["refunds"]
-    card    = data["card"]
+    data    = params["data"]  || {}
+    refunds = data["refunds"] || {}
+    card    = data["card"]    || {}
     params_filtered = {
       key:                   params['key'], # such as: charge.update etc..
       id:                    params['id'],

@@ -23,7 +23,7 @@ class EndpointController < ApplicationController
     url         = Rails.application.secrets.webhook_url
     notifier    = Slack::Notifier.new(url) 
     message     = build_notification_content
-    notifier.ping "\n#{message}\n"
+    notifier.ping "==========================\n#{message}\n"
   end
 
   def build_notification_content

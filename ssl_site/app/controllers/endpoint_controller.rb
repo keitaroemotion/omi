@@ -8,6 +8,10 @@ class EndpointController < ApplicationController
   def index
   end
 
+  #
+  # take the incoming POST request from Omise webhook server
+  # and parse|filter is, then send to Email|Slack notification
+  #
   def take
     send_email
     send_slack

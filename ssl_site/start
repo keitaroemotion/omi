@@ -1,0 +1,1 @@
+cd ssl_site; rails server -e development -b 0.0.0.0 -p 3000

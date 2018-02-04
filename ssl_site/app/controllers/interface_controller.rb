@@ -24,6 +24,11 @@ class InterfaceController < ApplicationController
     end
   end
 
+  #
+  #     Email Generation/Sending Section
+  #
+  # XXX might have to be located in another backend class
+  #
   def send_email
     sender_email_address = Rails.application.secrets.sender_email_address
     target_addresses     = Rails.application.secrets.default_target_addresses.split(",")

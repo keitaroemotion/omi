@@ -1,8 +1,8 @@
 require 'test_helper'
 
-class InterfaceControllerTest < ActionDispatch::IntegrationTest
+class EndpointControllerTest < ActionDispatch::IntegrationTest
   test "should get index" do
-    get interface_index_url
+    get endpoint_index_url
     assert_response :success
   end
 

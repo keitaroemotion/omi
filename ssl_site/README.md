@@ -21,4 +21,9 @@ Things you may want to cover:
 
 * Deployment instructions
 
+```
+cp config/secrets.yml.bk config/secrets.yml
+```
+and please fill the secrets
+
 * ...

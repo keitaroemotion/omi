@@ -1,4 +1,6 @@
-config
+./config
+mailer/config
+slacker/config
 transport_backend_to_aws
 go_to_aws
 just_copy_backend

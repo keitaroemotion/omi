@@ -5,3 +5,4 @@ just_copy_backend
 test_env/omise-webhook/
 curl_result.tmp
 ssl_site/config/secrets.yml
+ssl_site/.history

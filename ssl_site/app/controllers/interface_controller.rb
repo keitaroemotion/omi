@@ -1,14 +1,14 @@
 class InterfaceController < ApplicationController
   skip_before_action :verify_authenticity_token
 
-  require 'mail'
   require 'io/console'
+  require 'mail'
+  require 'slack-notifier'
 
   def index
   end
 
   def take
-    archive    
     send_email
     send_slack
   end
@@ -16,12 +16,10 @@ class InterfaceController < ApplicationController
   private
 
   def send_slack
-  end
-
-  def archive
-    File.open(".history", "a") do |f|
-      f.puts params.to_s
-    end
+    url         = Rails.application.secrets.webhook_url
+    notifier    = Slack::Notifier.new(url) 
+    message     = build_notification_content
+    notifier.ping message
   end
 
   def build_notification_content

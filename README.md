@@ -93,7 +93,11 @@ then, if you want detailed information of the card,
 $ omi card get token=[token]
 ```
 
+
+
 XXX this part, coming soon
+
+
 
 
 then touch the file name `config` and edit as follows:
@@ -130,6 +134,15 @@ https://[random hash].ngrok.io/omise/webhook
 
 4. after that, you are going to execute whatever API command as you like.
 
+
+## Authentication Failure
+When you get authentication failure from API, it means your command missing key parameter.
+
+```
+-s [skey]
+```
+
+so just please add it to the last of the command.
 
 ## Special Thanks
 Thanks to Mr. Akira Narita, it is possible to test the Omise Webhook API with his [omise-webhook](http://akinrt.hatenablog.com/entry/omise-webhook) module. If you quickly want to test Omise-Webhook API without launching SSL/TLS certificate enhancing https website, his repository helps you.

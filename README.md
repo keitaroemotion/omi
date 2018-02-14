@@ -31,8 +31,30 @@ Grammar is basically as follows:
 $ omi [api] [action]
 ```
 
-For instance, when calling *Card* API and enlist the cards,
+### Token API (Testing Purpose Only)
+This API is testing purpose only. 
+For the production-level card addition, you need
+to use **Omise.js**
 
+#### create token
+
+```
+$ omi token create
+```
+
+if you want to edit the request parameters,
+(for instance, by default, it sets the test card,
+ you may want to test arbiterary card)
+
+just add -e parameter such as:
+
+```
+$ omi token create -e
+```
+
+### Card API
+
+#### enlist cards
 ```
 $ omi card list customer=[customer_id]
 ```
@@ -48,6 +70,7 @@ $ omi card list
 
 brings you to the interactive mode, since the customer has not been specified.
 it does ask you to choose customers you created, if you have.
+
 
 
 

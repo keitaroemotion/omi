@@ -86,7 +86,7 @@ $ omi token create -v
 $ omi token get token=[token]
 ```
 
-### Customer API
+### [Customer API](https://www.omise.co/customers-api)
 #### create customer
 ```
 $ omi customer create
@@ -122,7 +122,7 @@ $ omi customer update
 $ omi customer destroy
 ```
 
-### Card API
+### [Card API](https://www.omise.co/cards-api)
 
 #### enlist cards
 ```

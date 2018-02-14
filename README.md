@@ -17,6 +17,45 @@ This file is the real example to demonstrate how to embed Omise.js to collect ca
 
 omi does call Omise Api. Initially you need to go to [Omise Dashboard](https://dashboard.omise.co/test/keys) and copy its public | private key starts from `pkey_` `skey_`
 
+## installation
+
+```
+$ ./installer
+```
+
+## usage
+
+Grammar is basically as follows:
+
+```
+$ omi [api] [action]
+```
+
+For instance, when calling *Card* API and enlist the cards,
+
+```
+$ omi card list customer=[customer_id]
+```
+
+will automatically allow you to list the cards related to the customer_id.
+
+
+Also,
+
+```
+$ omi card list
+```
+
+brings you to the interactive mode, since the customer has not been specified.
+it does ask you to choose customers you created, if you have.
+
+
+
+
+XXX this part, coming soon
+
+
+
 then touch the file name `config` and edit as follows:
 
 ```

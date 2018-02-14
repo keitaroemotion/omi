@@ -282,6 +282,25 @@ def gsub(key, script_body, options, config)
     script_body
 end        
 
+def secondary_api_call(script_body, skey, api, prefix, value)
+  puts
+  cmd = "curl -s -X GET https://api.omise.co/#{api}s -u #{skey}:"
+  if api == "card"
+      puts api
+      cmd = "curl -s -X GET https://api.omise.co/customers/#{value}/cards"
+  end
+  puts "[Secondary Command Call]: #{cmd.cyan}"
+  result = `#{cmd}`
+  if result.include?("authentication failed")
+    abort("\n\nauthentication failure: #{cmd}\n\n")
+  end
+  result
+      .split("\n")
+      .select { |a| a.include?(prefix) }
+      .map    { |a| /#{prefix}[a-z0-9_]+/.match(a).to_s.strip }
+      .uniq
+end
+
 #
 # XXX needs to be refactored
 #
@@ -291,24 +310,12 @@ end
 #
 def list_values_and_gsub(script_body, skey, api, prefix, options, value="")
     if script_body.include?("$#{api}") 
-       puts
-       cmd = "curl -s -X GET https://api.omise.co/#{api}s -u #{skey}:"
-       if api == "card"
-           puts api
-           cmd = "curl -s -X GET https://api.omise.co/customers/#{value}/cards"
-       end
-       puts cmd.cyan
-       result = `#{cmd}`
-       list = result
-                  .split("\n")
-                  .select { |a| a.include?(prefix) }
-                  .map    { |a| /#{prefix}[a-z0-9_]+/.match(a).to_s.strip }
-                  .uniq
+       list = secondary_api_call(script_body, skey, api, prefix, value)
        if api == "customer" && options["customer"]
            value = options["customer"]
        else
            if list.size == 0
-               puts result
+               puts "[None]"
            else  
                list.each_with_index { |e, i| puts "[#{i}] #{e}" }
                print "\n[which?][q:Quit] "    

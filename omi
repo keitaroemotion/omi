@@ -283,22 +283,22 @@ def gsub(key, script_body, options, config)
 end        
 
 def secondary_api_call(script_body, skey, api, prefix, value)
-  puts
-  cmd = "curl -s -X GET https://api.omise.co/#{api}s -u #{skey}:"
-  if api == "card"
-      puts api
-      cmd = "curl -s -X GET https://api.omise.co/customers/#{value}/cards"
-  end
-  puts "[Secondary Command Call]: #{cmd.cyan}"
-  result = `#{cmd}`
-  if result.include?("authentication failed")
-    abort("\n\nauthentication failure: #{cmd}\n\n")
-  end
-  result
-      .split("\n")
-      .select { |a| a.include?(prefix) }
-      .map    { |a| /#{prefix}[a-z0-9_]+/.match(a).to_s.strip }
-      .uniq
+    puts
+    cmd = "curl -s -X GET https://api.omise.co/#{api}s -u #{skey}:"
+    if api == "card"
+        puts api
+        cmd = "curl -s -X GET https://api.omise.co/customers/#{value}/cards -u #{skey}:"
+    end
+    puts "[Secondary Command Call]: #{cmd.cyan}"
+    result = `#{cmd}`
+    if result.include?("authentication failed")
+      abort("\n\nauthentication failure: #{cmd}\n\n")
+    end
+    result
+        .split("\n")
+        .select { |a| a.include?(prefix) }
+        .map    { |a| /#{prefix}[a-z0-9_]+/.match(a).to_s.strip }
+        .uniq
 end
 
 #

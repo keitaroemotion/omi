@@ -42,6 +42,14 @@ to use **Omise.js**
 $ omi token create
 ```
 
+This command copis the result token such as
+
+```
+token=[token_id]
+```
+
+to the clipboard.
+
 if you want to edit the request parameters,
 (for instance, by default, it sets the test card,
  you may want to test arbiterary card)
@@ -50,6 +58,12 @@ just add -e parameter such as:
 
 ```
 $ omi token create -e
+```
+
+#### get token
+
+```
+$ omi token get token=[token]
 ```
 
 ### Card API
@@ -61,7 +75,6 @@ $ omi card list customer=[customer_id]
 
 will automatically allow you to list the cards related to the customer_id.
 
-
 Also,
 
 ```
@@ -72,11 +85,7 @@ brings you to the interactive mode, since the customer has not been specified.
 it does ask you to choose customers you created, if you have.
 
 
-
-
-
 XXX this part, coming soon
-
 
 
 then touch the file name `config` and edit as follows:

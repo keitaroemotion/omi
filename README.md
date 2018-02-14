@@ -44,7 +44,7 @@ Grammar is basically as follows:
 $ omi [api] [action]
 ```
 
-### Token API (Testing Purpose Only)
+### [Token API (Testing Purpose Only)](https://www.omise.co/tokens-api)
 This API is testing purpose only. 
 For the production-level card addition, you need
 to use **Omise.js**

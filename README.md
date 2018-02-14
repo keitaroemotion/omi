@@ -164,7 +164,7 @@ if you want to delete the card,
 $ omi card destroy
 ```
 
-### [Charge API](https://www.omise.co/cards-api)
+### [Charge API](https://www.omise.co/charges-api)
 #### enlist charges
 ```
 $ omi charge list

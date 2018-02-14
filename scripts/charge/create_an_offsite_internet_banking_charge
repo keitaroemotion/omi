@@ -37,6 +37,6 @@ curl https://api.omise.co/charges \
   -X POST \
   -u $skey \
   -d "amount=100" \
-  -d "currency=thb" \
+  -d "currency=jpy" \
   -d "return_uri=http://www.example.com" \
-  -d "source=src_test_59wbyjr7jz44d8nzcd6"
+  -d "source=$source"

@@ -1,11 +1,12 @@
 curl https://api.omise.co/recipients \
   -X POST \
   -u $skey \
-  -d "name=James Smith" \
-  -d "email=test_recp123@localhost" \
-  -d "description=My first other recipient" \
+  -d "name=test recipient" \
+  -d "email=john.doe@example.com" \
+  -d "description=John Doe" \
   -d "type=individual" \
-  -d "tax_id=1234567890" \
-  -d "bank_account[brand]=test" \
-  -d "bank_account[number]=acc12345" \
-  -d "bank_account[name]=James Smith"
+  -d "bank_account[account_type]=normal" \
+  -d "bank_account[bank_code]=0001" \
+  -d "bank_account[branch_code]=001" \
+  -d "bank_account[number]=0000001" \
+  -d "bank_account[name]=Test bank account"

@@ -73,6 +73,13 @@ just add -e parameter such as:
 $ omi token create -e
 ```
 
+Usually, the response of the API call is by default console output.
+You can change this to vim editor mode such as:
+
+```
+$ omi token create -v
+```
+
 #### get token info
 
 ```
@@ -117,8 +124,7 @@ if you want to update the card,
 $ omi card update
 ```
 
-XXX this part, coming soon
-
+et cetra. The others are in the help menu.
 
 ## preparing the test environment
 

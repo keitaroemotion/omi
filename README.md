@@ -17,10 +17,23 @@ This file is the real example to demonstrate how to embed Omise.js to collect ca
 
 omi does call Omise Api. Initially you need to go to [Omise Dashboard](https://dashboard.omise.co/test/keys) and copy its public | private key starts from `pkey_` `skey_`
 
-## installation
+## setup
 
+To install,
 ```
 $ ./installer
+```
+
+```
+$ mkdir /usr/local/etc/omi/
+$ vim /usr/local/etc/omi/config
+```
+
+then touch the file name `config` and edit as follows:
+
+```
+skey=[your secret key on Omise Dashboard]
+pkey=[your public key on Omise Dashboard]
 ```
 
 ## usage
@@ -65,6 +78,7 @@ $ omi token create -e
 ```
 $ omi token get token=[token]
 ```
+
 ### Card API
 
 #### enlist cards
@@ -89,29 +103,22 @@ $ omi card list customer=[customer_id] | grep "card_"
 ```
 
 then, if you want detailed information of the card,
+
 ```
-$ omi card get token=[token]
+$ omi card get
 ```
 
+with this, interactive mode guids you through finding the data of 
+cards belonging to specific customer.
 
+
+if you want to update the card,
+```
+$ omi card update
+```
 
 XXX this part, coming soon
 
-
-
-
-then touch the file name `config` and edit as follows:
-
-```
-skey=[your secret key on Omise Dashboard]
-pkey=[your public key on Omise Dashboard]
-```
-
-after that, please do the following:
-
-```
-$./omi scripts/[api]/[api_to_call]
-```
 
 ## preparing the test environment
 

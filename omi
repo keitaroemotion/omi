@@ -5,16 +5,12 @@
 #
 # ./api_caller scripts/[your script you want]
 #
-#
 # XXX might need Turing Incomplete features 
 #     such that enables executing the script files
 #     consecutively the former script passes the
 #     output to the latter.
 #
 # XXX might need to make this application installable  
-
-
-#
 # XXX omi card destroy => authentication failure
 #
 

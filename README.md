@@ -118,10 +118,14 @@ $ omi card get
 with this, interactive mode guids you through finding the data of 
 cards belonging to specific customer.
 
-
 if you want to update the card,
 ```
 $ omi card update
+```
+
+if you want to delete the card,
+```
+$ omi card destroy
 ```
 
 et cetra. The others are in the help menu.

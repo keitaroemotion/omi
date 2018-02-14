@@ -86,6 +86,42 @@ $ omi token create -v
 $ omi token get token=[token]
 ```
 
+### Customer API
+#### create customer
+```
+$ omi customer create
+```
+
+#### create customer with specific card
+```
+$ omi customer create_wc token=[token_id]
+```
+
+#### attach a card to customer
+```
+$ omi customer add_card token=[token_id]
+```
+
+#### list customers
+```
+$ omi customer list
+```
+
+#### get customer
+```
+$ omi customer get
+```
+
+#### update customer
+```
+$ omi customer update
+```
+
+#### destory customer
+```
+$ omi customer destroy
+```
+
 ### Card API
 
 #### enlist cards

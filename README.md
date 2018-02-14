@@ -42,7 +42,7 @@ to use **Omise.js**
 $ omi token create
 ```
 
-This command copis the result token such as
+This command copies the result token such as
 
 ```
 token=[token_id]
@@ -60,12 +60,11 @@ just add -e parameter such as:
 $ omi token create -e
 ```
 
-#### get token
+#### get token info
 
 ```
 $ omi token get token=[token]
 ```
-
 ### Card API
 
 #### enlist cards
@@ -84,6 +83,15 @@ $ omi card list
 brings you to the interactive mode, since the customer has not been specified.
 it does ask you to choose customers you created, if you have.
 
+if you want to look only for the cards of specific customer, then:
+```
+$ omi card list customer=[customer_id] | grep "card_"
+```
+
+then, if you want detailed information of the card,
+```
+$ omi card get token=[token]
+```
 
 XXX this part, coming soon
 

@@ -1,4 +1,3 @@
 cp omi /usr/local/bin/
 mkdir -p /usr/local/etc/omi
 cp -r scripts /usr/local/etc/omi
-cp config /usr/local/etc/omi

@@ -500,43 +500,8 @@ else
     puts command.green
     puts "-------------------------"
 
-    shell_execution_result = `#{script_body}`
-    puts shell_execution_result
-
-    if File.basename(script_path) == "create_a_token"
-        token = shell_execution_result
-            .split("\n")
-            .select{ |a| a.include?("tokn_")             }
-            .map   { |a| /tokn_[a-z0-9_]+/.match(a).to_s }
-            .flatten
-            .uniq
-        `echo token=#{token.first} | pbcopy`    
-    end
-end    
-
-#
-# remove commented lines from the script file
-#
-command = script_body.lines.select { |line| !(line.start_with?("#")) }.join.chomp
-
-#
-# this is the __main__ execution part
-#
-if vim?
-   result           = `#{script_body}`
-   sentence         = "#{command.strip}\n\n#{result}"
-   result_file_name = "curl_result.tmp"
-   File.open(result_file_name, "w") do |f|
-       f.puts sentence
-   end
-   system "vim #{result_file_name}"
-else
-    puts "-------------------------"
-    puts "[Command]\n"
-    puts command.green
-    puts "-------------------------"
-
-    shell_execution_result = `#{script_body}`
+    shell_execution_result = `#{command}`
+    puts "[Result]"
     puts shell_execution_result
 
     if File.basename(script_path) == "create_a_token"

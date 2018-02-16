@@ -283,11 +283,11 @@ def gsub(key, script_body, options, config)
 end        
 
 def host
-    localhost? ? "localhost" : "https://api.omise.co"
+    localhost? ? "http://localhost" : "https://api.omise.co"
 end
 
 def update_url_in_script_body(script, new_url)
-    script.gsub("https://api.omise.co", "https://#{new_url}")
+    script.gsub("https://api.omise.co", new_url)
 end
 
 def secondary_api_call(script_body, skey, api, prefix, value)
@@ -355,7 +355,7 @@ script_body, value = list_values_and_gsub(script_body, skey, "card", "card_", op
 # script_body update
 #
 if localhost?
-    script_body = update_url_in_script_body(script_body, "localhost:3000")
+    script_body = update_url_in_script_body(script_body, "http://localhost:3000")
 end  
 
 unless script_path.include?("curl -s")
@@ -454,11 +454,13 @@ end
 
 keys = get_keys
 
-if keys[:pkey]
+if keys[:pkey] != ""
+  puts "key substitution: #{keys[:pkey]}"
   script_body = script_body.gsub(/pkey_[\d\w\:^\s]+$/, keys[:pkey]) 
 end
 
-if keys[:skey]
+if keys[:skey] != ""
+  puts "key substitution: #{keys[:skey]}"
   script_body = script_body.gsub(/skey_[\d\w\:^\s]+$/, keys[:skey]) 
 end
 
@@ -502,7 +504,15 @@ else
 
     shell_execution_result = `#{command}`
     puts "[Result]"
-    puts shell_execution_result
+    if shell_execution_result.include?("div")
+      File.open("result.html", "w") do |f|
+          f.puts(shell_execution_result)
+      end
+      system "open result.html"
+      abort
+    else
+        puts shell_execution_result
+    end
 
     if File.basename(script_path) == "create_a_token"
         token = shell_execution_result

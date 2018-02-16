@@ -462,8 +462,6 @@ if keys[:skey]
   script_body = script_body.gsub(/skey_[\d\w\:^\s]+$/, keys[:skey]) 
 end
 
-abort(">>> #{script_body}")
-
 def pre_edit?
   ARGV.include?("-e")
 end

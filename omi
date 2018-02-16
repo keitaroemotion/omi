@@ -439,11 +439,11 @@ script_body, value = list_values_and_gsub(script_body, skey, "charge", "chrg_", 
 script_body, value = list_values_and_gsub(script_body, skey, "card", "card_", options, value)
 
 def get_keys
-  keys = ARGV.select {|a| /[ps]key[\d\w_\:]+/ }
+  keys = ARGV.select {|a| /[ps]key_[\d\w\_\:]+/ =~ a }
   if keys.size > 0
-    {
-      pkey: keys.select {|a| /pkey[\d\w_\:]+/ =~ a }.first.to_s,
-      skey: keys.select {|a| /skey[\d\w_\:]+/ =~ a }.first.to_s
+    return {
+      pkey: (keys.select{|a| /pkey/ =~ a }.first.to_s.strip.chomp),
+      skey: (keys.select{|a| /skey/ =~ a }.first.to_s.strip.chomp)
     }  
   end
 end
@@ -456,12 +456,13 @@ keys = get_keys
 
 if keys[:pkey] != ""
   puts "key substitution: #{keys[:pkey]}"
-  script_body = script_body.gsub(/pkey_[\d\w\:^\s]+$/, keys[:pkey]) 
+  script_body = script_body.gsub(/pkey_[\d\w\_\:]+/, keys[:pkey]) 
 end
 
 if keys[:skey] != ""
   puts "key substitution: #{keys[:skey]}"
-  script_body = script_body.gsub(/skey_[\d\w\:^\s]+$/, keys[:skey]) 
+  script_body = script_body.gsub(/skey_[\d\w\_\:]+/, keys[:skey]) 
+  puts "\n\n\n#{script_body}\n\n\n"
 end
 
 def pre_edit?

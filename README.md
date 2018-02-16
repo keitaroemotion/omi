@@ -194,6 +194,15 @@ https://[random hash].ngrok.io/omise/webhook
 4. after that, you are going to execute whatever API command as you like.
 
 
+## Local Host Execution (Only for Omise Developers)
+
+For Omise Developers, the option "-l" helps to access to its local instance (localhost)
+
+Example:
+```
+$ omi charge list -l
+```
+
 ## Authentication Failure
 When you get authentication failure from API, it means your command missing key parameter.
 

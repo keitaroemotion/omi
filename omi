@@ -132,6 +132,10 @@ def options
     ARGV.select {|a| /^.+[\=]+.+$/ =~ a }
 end
 
+def localhost?
+    ARGV.include?("-l")
+end
+
 #
 # extract the api optcode from the ARGV
 #
@@ -278,12 +282,108 @@ def gsub(key, script_body, options, config)
     script_body
 end        
 
+def host
+    localhost? ? "localhost" : "https://api.omise.co"
+end
+
+def update_url_in_script_body(script, new_url)
+    script.gsub("https://api.omise.co", "https://#{new_url}")
+end
+
 def secondary_api_call(script_body, skey, api, prefix, value)
     puts
-    cmd = "curl -s -X GET https://api.omise.co/#{api}s -u #{skey}:"
     if api == "card"
         puts api
-        cmd = "curl -s -X GET https://api.omise.co/customers/#{value}/cards -u #{skey}:"
+        cmd = "curl -s -X GET #{host}/customers/#{value}/cards -u #{skey}:"
+    else    
+        cmd = "curl -s -X GET #{host}/#{api}s -u #{skey}:"
+    end
+    puts "[Secondary Command Call]: #{cmd.cyan}"
+    result = `#{cmd}`
+    if result.include?("authentication failed")
+      abort("\n\nauthentication failure: #{cmd}\n\n")
+    end
+    result
+        .split("\n")
+        .select { |a| a.include?(prefix) }
+        .map    { |a| /#{prefix}[a-z0-9_]+/.match(a).to_s.strip }
+        .uniq
+end
+
+#
+# XXX needs to be refactored
+#
+# if specific parameter is missing, this script enlist the
+# existing values, then, let user choose the one,
+# and eventually this value is assigned to the main script_body
+#
+def list_values_and_gsub(script_body, skey, api, prefix, options, value="")
+    if script_body.include?("$#{api}") 
+       list = secondary_api_call(script_body, skey, api, prefix, value)
+       if api == "customer" && options["customer"]
+           value = options["customer"]
+       else
+           if list.size == 0
+               puts "[None]"
+           else  
+               list.each_with_index { |e, i| puts "[#{i}] #{e}" }
+               print "\n[which?][q:Quit] "    
+               input = $stdin.gets.chomp
+               abort if input.downcase == "q"
+               value = list[input.to_i]
+           end
+       end    
+       script_body = script_body.gsub("$#{api}", value)
+    end
+    [script_body, value]
+end
+
+#
+# XXX need this to be refactored as iteration
+#
+script_body = gsub("transfer", script_body, options, config_hash)
+script_body = gsub("recipient", script_body, options, config_hash)
+script_body = gsub("charge", script_body, options, config_hash)
+script_body = gsub("token", script_body, options, config_hash)
+script_body = gsub("dispute", script_body, options, config_hash)
+script_body = gsub("amount", script_body, options, config_hash)
+script_body, value = list_values_and_gsub(script_body, skey, "customer", "cust_", options)
+script_body, value = list_values_and_gsub(script_body, skey, "charge", "chrg_", options, value)
+script_body, value = list_values_and_gsub(script_body, skey, "card", "card_", options, value)
+
+#
+# script_body update
+#
+if localhost?
+    script_body = update_url_in_script_body(script_body, "localhost:3000")
+end  
+
+unless script_path.include?("curl -s")
+    script_body = script_body.gsub("curl", "curl -s")
+end
+
+def pre_edit?
+  ARGV.include?("-e")
+end
+
+#
+# if the argument "-e" included in ARGV,
+# command can be edited with vim editor before its execution.
+#
+if pre_edit?
+   tmp = ".tmp_file_omise"
+   File.open(tmp, "w") { |f| f.puts script_body }
+   system("vim #{tmp}")
+   script_body = File.read(tmp)
+   system("rm #{tmp}")
+end
+
+def secondary_api_call(script_body, skey, api, prefix, value)
+    puts
+    cmd = "curl -s -X GET #{host}/#{api}s -u #{skey}:"
+    if api == "card"
+        puts api
+        cmd = "curl -s -X GET #{host}/customers/#{value}/cards -u #{skey}:"
     end
     puts "[Secondary Command Call]: #{cmd.cyan}"
     result = `#{cmd}`
@@ -357,6 +457,42 @@ if pre_edit?
    script_body = File.read(tmp)
    system("rm #{tmp}")
 end
+
+#
+# remove commented lines from the script file
+#
+command = script_body.lines.select { |line| !(line.start_with?("#")) }.join.chomp
+
+#
+# this is the __main__ execution part
+#
+if vim?
+   result           = `#{script_body}`
+   sentence         = "#{command.strip}\n\n#{result}"
+   result_file_name = "curl_result.tmp"
+   File.open(result_file_name, "w") do |f|
+       f.puts sentence
+   end
+   system "vim #{result_file_name}"
+else
+    puts "-------------------------"
+    puts "[Command]\n"
+    puts command.green
+    puts "-------------------------"
+
+    shell_execution_result = `#{script_body}`
+    puts shell_execution_result
+
+    if File.basename(script_path) == "create_a_token"
+        token = shell_execution_result
+            .split("\n")
+            .select{ |a| a.include?("tokn_")             }
+            .map   { |a| /tokn_[a-z0-9_]+/.match(a).to_s }
+            .flatten
+            .uniq
+        `echo token=#{token.first} | pbcopy`    
+    end
+end    
 
 #
 # remove commented lines from the script file

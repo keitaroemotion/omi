@@ -286,8 +286,16 @@ def host
     localhost? ? "http://api.lvh.me" : "https://api.omise.co"
 end
 
+#
+# XXX LITTLE BIT VERBOSE, NEEDS OPTIMIZATION HERE
+#
 def update_url_in_script_body(script, new_url)
-    script.gsub("https://api.omise.co", new_url)
+    subdomain = api.start_with?("token") ? "vault" : "api"
+    script = script.gsub("https://#{subdomain}.omise.co", new_url)
+    if api.start_with?("token")  
+        script = script.gsub("api.lvh.me:3000", "vault.lvh.me:4500")
+    end  
+    script
 end
 
 def secondary_api_call(script_body, skey, api, prefix, value)
@@ -452,9 +460,9 @@ unless /curl\s+\-s/ =~ script_body
     script_body = script_body.gsub("curl", "curl -s")
 end
 
-keys = get_keys
+keys = get_keys || {pkey: "", skey: ""}
 
-if keys[:pkey] != ""
+if keys[:pkey] != "" 
   puts "key substitution: #{keys[:pkey]}"
   script_body = script_body.gsub(/pkey_[\d\w\_\:]+/, keys[:pkey]) 
 end

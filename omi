@@ -283,7 +283,7 @@ def gsub(key, script_body, options, config)
 end        
 
 def host
-    localhost? ? "http://localhost" : "https://api.omise.co"
+    localhost? ? "http://api.lvh.me" : "https://api.omise.co"
 end
 
 def update_url_in_script_body(script, new_url)
@@ -355,7 +355,7 @@ script_body, value = list_values_and_gsub(script_body, skey, "card", "card_", op
 # script_body update
 #
 if localhost?
-    script_body = update_url_in_script_body(script_body, "http://localhost:3000")
+    script_body = update_url_in_script_body(script_body, "http://api.lvh.me:3000")
 end  
 
 unless script_path.include?("curl -s")

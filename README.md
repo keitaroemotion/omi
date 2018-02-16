@@ -203,6 +203,23 @@ Example:
 $ omi charge list -l
 ```
 
+## passing arbiterary (pkey|skey) as argument
+
+For instace, if you want use the specific skey instead of default one,
+```
+$ omi charge list skey_... 
+```
+
+Or if pkey,
+```
+$ omi charge list pkey_... 
+```
+
+Or both,
+```
+$ omi charge list pkey_... skey_...
+```
+
 ## Authentication Failure
 When you get authentication failure from API, it means your command missing key parameter.
 

@@ -438,9 +438,31 @@ script_body, value = list_values_and_gsub(script_body, skey, "customer", "cust_"
 script_body, value = list_values_and_gsub(script_body, skey, "charge", "chrg_", options, value)
 script_body, value = list_values_and_gsub(script_body, skey, "card", "card_", options, value)
 
-unless script_path.include?("curl -s")
+def get_keys
+  keys = ARGV.select {|a| /[ps]key[\d\w_\:]+/ }
+  if keys.size > 0
+    {
+      pkey: keys.select {|a| /pkey[\d\w_\:]+/ =~ a }.first.to_s,
+      skey: keys.select {|a| /skey[\d\w_\:]+/ =~ a }.first.to_s
+    }  
+  end
+end
+
+unless /curl\s+\-s/ =~ script_body
     script_body = script_body.gsub("curl", "curl -s")
 end
+
+keys = get_keys
+
+if keys[:pkey]
+  script_body = script_body.gsub(/pkey_[\d\w\:^\s]+$/, keys[:pkey]) 
+end
+
+if keys[:skey]
+  script_body = script_body.gsub(/skey_[\d\w\:^\s]+$/, keys[:skey]) 
+end
+
+abort(">>> #{script_body}")
 
 def pre_edit?
   ARGV.include?("-e")

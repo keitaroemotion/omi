@@ -415,30 +415,6 @@ if pre_edit?
    system("rm #{tmp}")
 end
 
-# def secondary_api_call(script_body, skey, api, prefix, value)
-#     puts "skey"
-#     puts "skey: #{skey}"
-# 
-#     puts
-#     cmd = "curl -s -X GET #{host}/#{api}s -u #{skey}:"
-#     if api == "card"
-#         puts api
-#         cmd = "curl -s -X GET #{host}/customers/#{value}/cards -u #{skey}:"
-#     end
-#     puts "[Secondary Command Call]: #{cmd.cyan}"
-#     result = `#{cmd}`
-#     puts "res:"
-#     puts "res: #{result}"
-#     if result.include?("authentication failed")
-#       abort("\n\nauthentication failure: #{cmd}\n\n")
-#     end
-#     result
-#         .split("\n")
-#         .select { |a| a.include?(prefix) }
-#         .map    { |a| /#{prefix}[a-z0-9_]+/.match(a).to_s.strip }
-#         .uniq
-# end
-
 #
 # XXX need this to be refactored as iteration
 #
@@ -458,18 +434,6 @@ end
 
 def pre_edit?
     ARGV.include?("-e")
-end
-
-#
-# if the argument "-e" included in ARGV,
-# command can be edited with vim editor before its execution.
-#
-if pre_edit?
-   tmp = ".tmp_file_omise"
-   File.open(tmp, "w") { |f| f.puts script_body }
-   system("vim #{tmp}")
-   script_body = File.read(tmp)
-   system("rm #{tmp}")
 end
 
 #

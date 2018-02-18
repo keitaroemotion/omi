@@ -325,7 +325,7 @@ def gsub(key, script_body, options, config)
 end        
 
 def host
-    localhost? ? "http://api.lvh.me" : "https://api.omise.co"
+    localhost? ? "http://api.lvh.me:3000" : "https://api.omise.co"
 end
 
 #

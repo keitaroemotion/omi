@@ -290,7 +290,21 @@ def get_script_path(key)
     "#{SCRIPTS}/#{api}/#{translate(api, key)}"
 end
 
-script_path = get_script_path(args.first)
+def verbs
+  ARGV.select do |a|
+      %w(
+        create
+        destroy
+        create_wc
+        add_card
+        list
+        get
+        update
+      ).include?(a)
+  end.first    
+end
+
+script_path = get_script_path(verbs)
 script_body = File.read(script_path).gsub("$skey", skey).gsub("$pkey", pkey)
 
 #

@@ -200,8 +200,16 @@ For Omise Developers, the option "-l" helps to access to its local instance (loc
 
 Example:
 ```
-$ omi charge list -l
+$ omi charge list -l [your skey|pkey of localhost]
 ```
+
+or, simply you can call like this:
+
+Example:
+```
+$ oml charge list [your skey|pkey of localhost]
+```
+
 
 ## passing arbiterary (pkey|skey) as argument
 

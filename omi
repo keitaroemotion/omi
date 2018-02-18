@@ -83,6 +83,7 @@ def help(key=nil)
     list.each {|x| puts x}
     puts "[option: -e allows editing the command before execution]"
     puts "[option: -v allows viewing the execution result]"
+    puts "[option: -l swaps URL into localhost]"
     puts
     abort
 end
@@ -117,9 +118,36 @@ def config
     lines.map{ |line| line.split("=").map(&:chomp) }.flatten
 end
 
+def automate_key(keys, sym)
+    /[^\:]$/ =~ keys[sym] ? keys[sym] + ":" : keys[sym]
+end
+
+def get_keys
+    keys = ARGV.select {|a| /[ps]key_[\d\w\_\:]+/ =~ a }
+    if keys.size > 0
+        return {
+            pkey: (keys.select{|a| /pkey/ =~ a }.first.to_s.strip.chomp),
+            skey: (keys.select{|a| /skey/ =~ a }.first.to_s.strip.chomp)
+        }  
+    end
+end
+
 config_hash = Hash[*(config)]
 skey        = config_hash["skey"]
 pkey        = config_hash["pkey"]
+
+keys = get_keys || {pkey: "", skey: ""}
+
+if keys[:pkey] != "" 
+    pkey = automate_key(keys, :pkey)
+    puts "key substitution: #{pkey}"
+end
+
+if keys[:skey] != ""
+    skey = automate_key(keys, :skey)
+    puts "key substitution: #{skey}"
+end
+
 
 def args
     ARGV.select {|a| /^[^\=]+$/ =~ a  && !APIS.include?(a) }
@@ -302,9 +330,9 @@ def secondary_api_call(script_body, skey, api, prefix, value)
     puts
     if api == "card"
         puts api
-        cmd = "curl -s -X GET #{host}/customers/#{value}/cards -u #{skey}:"
+        cmd = "curl -s -X GET #{host}/customers/#{value}/cards -u #{skey}"
     else    
-        cmd = "curl -s -X GET #{host}/#{api}s -u #{skey}:"
+        cmd = "curl -s -X GET #{host}/#{api}s -u #{skey}"
     end
     puts "[Secondary Command Call]: #{cmd.cyan}"
     result = `#{cmd}`
@@ -332,7 +360,7 @@ def list_values_and_gsub(script_body, skey, api, prefix, options, value="")
            value = options["customer"]
        else
            if list.size == 0
-               puts "[None]"
+               abort("[#{api}]:               No record")
            else  
                list.each_with_index { |e, i| puts "[#{i}] #{e}" }
                print "\n[which?][q:Quit] "    
@@ -345,6 +373,7 @@ def list_values_and_gsub(script_body, skey, api, prefix, options, value="")
     end
     [script_body, value]
 end
+
 
 #
 # XXX need this to be refactored as iteration
@@ -386,95 +415,49 @@ if pre_edit?
    system("rm #{tmp}")
 end
 
-def secondary_api_call(script_body, skey, api, prefix, value)
-    puts
-    cmd = "curl -s -X GET #{host}/#{api}s -u #{skey}:"
-    if api == "card"
-        puts api
-        cmd = "curl -s -X GET #{host}/customers/#{value}/cards -u #{skey}:"
-    end
-    puts "[Secondary Command Call]: #{cmd.cyan}"
-    result = `#{cmd}`
-    if result.include?("authentication failed")
-      abort("\n\nauthentication failure: #{cmd}\n\n")
-    end
-    result
-        .split("\n")
-        .select { |a| a.include?(prefix) }
-        .map    { |a| /#{prefix}[a-z0-9_]+/.match(a).to_s.strip }
-        .uniq
-end
-
-#
-# XXX needs to be refactored
-#
-# if specific parameter is missing, this script enlist the
-# existing values, then, let user choose the one,
-# and eventually this value is assigned to the main script_body
-#
-def list_values_and_gsub(script_body, skey, api, prefix, options, value="")
-    if script_body.include?("$#{api}") 
-       list = secondary_api_call(script_body, skey, api, prefix, value)
-       if api == "customer" && options["customer"]
-           value = options["customer"]
-       else
-           if list.size == 0
-               puts "[None]"
-           else  
-               list.each_with_index { |e, i| puts "[#{i}] #{e}" }
-               print "\n[which?][q:Quit] "    
-               input = $stdin.gets.chomp
-               abort if input.downcase == "q"
-               value = list[input.to_i]
-           end
-       end    
-       script_body = script_body.gsub("$#{api}", value)
-    end
-    [script_body, value]
-end
+# def secondary_api_call(script_body, skey, api, prefix, value)
+#     puts "skey"
+#     puts "skey: #{skey}"
+# 
+#     puts
+#     cmd = "curl -s -X GET #{host}/#{api}s -u #{skey}:"
+#     if api == "card"
+#         puts api
+#         cmd = "curl -s -X GET #{host}/customers/#{value}/cards -u #{skey}:"
+#     end
+#     puts "[Secondary Command Call]: #{cmd.cyan}"
+#     result = `#{cmd}`
+#     puts "res:"
+#     puts "res: #{result}"
+#     if result.include?("authentication failed")
+#       abort("\n\nauthentication failure: #{cmd}\n\n")
+#     end
+#     result
+#         .split("\n")
+#         .select { |a| a.include?(prefix) }
+#         .map    { |a| /#{prefix}[a-z0-9_]+/.match(a).to_s.strip }
+#         .uniq
+# end
 
 #
 # XXX need this to be refactored as iteration
 #
-script_body = gsub("transfer", script_body, options, config_hash)
-script_body = gsub("recipient", script_body, options, config_hash)
-script_body = gsub("charge", script_body, options, config_hash)
-script_body = gsub("token", script_body, options, config_hash)
-script_body = gsub("dispute", script_body, options, config_hash)
-script_body = gsub("amount", script_body, options, config_hash)
+script_body        = gsub("transfer", script_body, options, config_hash)
+script_body        = gsub("recipient", script_body, options, config_hash)
+script_body        = gsub("charge", script_body, options, config_hash)
+script_body        = gsub("token", script_body, options, config_hash)
+script_body        = gsub("dispute", script_body, options, config_hash)
+script_body        = gsub("amount", script_body, options, config_hash)
 script_body, value = list_values_and_gsub(script_body, skey, "customer", "cust_", options)
 script_body, value = list_values_and_gsub(script_body, skey, "charge", "chrg_", options, value)
 script_body, value = list_values_and_gsub(script_body, skey, "card", "card_", options, value)
-
-def get_keys
-  keys = ARGV.select {|a| /[ps]key_[\d\w\_\:]+/ =~ a }
-  if keys.size > 0
-    return {
-      pkey: (keys.select{|a| /pkey/ =~ a }.first.to_s.strip.chomp),
-      skey: (keys.select{|a| /skey/ =~ a }.first.to_s.strip.chomp)
-    }  
-  end
-end
 
 unless /curl\s+\-s/ =~ script_body
     script_body = script_body.gsub("curl", "curl -s")
 end
 
-keys = get_keys || {pkey: "", skey: ""}
-
-if keys[:pkey] != "" 
-  puts "key substitution: #{keys[:pkey]}"
-  script_body = script_body.gsub(/pkey_[\d\w\_\:]+/, keys[:pkey]) 
-end
-
-if keys[:skey] != ""
-  puts "key substitution: #{keys[:skey]}"
-  script_body = script_body.gsub(/skey_[\d\w\_\:]+/, keys[:skey]) 
-  puts "\n\n\n#{script_body}\n\n\n"
-end
-
 def pre_edit?
-  ARGV.include?("-e")
+    ARGV.include?("-e")
 end
 
 #
@@ -521,6 +504,9 @@ else
       abort
     else
         puts shell_execution_result
+        if shell_execution_result.include?("authentication_failure")
+          puts "is your skey/pkey really correct?".red
+        end
     end
 
     if File.basename(script_path) == "create_a_token"

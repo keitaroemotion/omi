@@ -6,24 +6,33 @@
 
 def find(regex, target)
   result = ARGV.select {|a| regex =~ a }.first
-  abort("you need to add "+ target)
+  unless result
+    abort("you need to add "+ target)
+  end  
   result
 end
 
 def pkey
-  find(/^pkey/, "pkey")
+  find(/^pkey_/, "pkey")
 end
 
 def skey
-  find(/^pkey/, "pkey")
+  find(/^skey_/, "skey")
 end
 
 def assert(cond, message)
   cond || abort(message)
 end
 
-token_creation_result    = `omil #{pkey} #{skey} token create`
+token_creation_result    = `omil #{pkey} #{skey} token create --rms`
+
+puts token_creation_result
+
 token                    = /tokn_[\w\d^\s]+/.match(token_creation_result)
+
+unless token
+  abort("\ntoken creation failure\n\n")
+end
 
 customer_creation_result = `omil #{skey} customer create_wc token=#{token}`
 customer                 = /cust_[\w\d^\s]+/.match(customer_creation_result)

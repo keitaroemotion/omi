@@ -13,25 +13,25 @@ def find(regex, target)
 end
 
 def pkey
-  find(/^pkey_/, "pkey")
+  find(/^pkey/, "pkey")
 end
 
 def skey
-  find(/^skey_/, "skey")
+  find(/^skey/, "skey")
 end
 
 def assert(cond, message)
   cond || abort(message)
 end
 
-token_creation_result    = `omil #{pkey} #{skey} token create --rms`
+puts "pkey: #{pkey}"
+puts "skey: #{skey}"
 
-puts token_creation_result
-
+token_creation_result    = `omil #{pkey} #{skey} token create`
 token                    = /tokn_[\w\d^\s]+/.match(token_creation_result)
 
 unless token
-  abort("\ntoken creation failure\n\n")
+  abort("\ntoken creation failure. are you launching gateway???\n")
 end
 
 customer_creation_result = `omil #{skey} customer create_wc token=#{token}`
@@ -45,6 +45,16 @@ assert(/amount\": 100/   =~ charge_creation_result, "amount is incorrect")
 assert(/capture\": true/ =~ charge_creation_result, "capture is incomplete")
 
 puts "charge created: #{charge}"
+
+# list charge and then check it out
+charge_get_result = `omil #{skey} #{pkey} charge get charge=#{charge}`
+
+File.open(".tmp", "w") do |f|
+  f.puts charge_get_result
+end
+
+assert(/#{customer}/, "charge does not have customer")
+assert(/#{charge}/,   "charge does not have charge")
 
 customer_deletion_result = `omil #{skey} customer destroy customer=#{customer}`
 if /deleted\": true/ =~ customer_deletion_result

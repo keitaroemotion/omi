@@ -1,0 +1,43 @@
+#!/usr/bin/env ruby
+
+#
+# Scenario Test Sample
+#
+
+def find(regex, target)
+  result = ARGV.select {|a| regex =~ a }.first
+  abort("you need to add "+ target)
+  result
+end
+
+def pkey
+  find(/^pkey/, "pkey")
+end
+
+def skey
+  find(/^pkey/, "pkey")
+end
+
+def assert(cond, message)
+  cond || abort(message)
+end
+
+token_creation_result    = `omil #{pkey} #{skey} token create`
+token                    = /tokn_[\w\d^\s]+/.match(token_creation_result)
+
+customer_creation_result = `omil #{skey} customer create_wc token=#{token}`
+customer                 = /cust_[\w\d^\s]+/.match(customer_creation_result)
+
+charge_creation_result   =  `omil #{skey} charge wc customer=#{customer}`
+charge                   =  /chrg_[\w\d^\s]+/.match(charge_creation_result)
+
+assert(/success/         =~ charge_creation_result, "status is not successful")
+assert(/amount\": 100/   =~ charge_creation_result, "amount is incorrect")
+assert(/capture\": true/ =~ charge_creation_result, "capture is incomplete")
+
+puts "charge created: #{charge}"
+
+customer_deletion_result = `omil #{skey} customer destroy customer=#{customer}`
+if /deleted\": true/ =~ customer_deletion_result
+  puts "customer deleted: #{customer}"
+end

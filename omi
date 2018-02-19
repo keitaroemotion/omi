@@ -480,11 +480,19 @@ if dry_run?
 end
 
 #
+# remove -s from curl
+#
+if ARGV.include?("--rms")
+  script_body = script_body.gsub("-s", "") 
+  command     = command.gsub("-s", "")
+end
+
+#
 # this is the __main__ execution part
 #
 if vim?
    result           = `#{script_body}`
-   sentence         = "#{command.strip}\n\n#{result}"
+   sentence         = "#{script_body.strip}\n\n#{result}"
    result_file_name = "curl_result.tmp"
    File.open(result_file_name, "w") do |f|
        f.puts sentence

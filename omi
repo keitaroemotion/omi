@@ -81,6 +81,7 @@ def help(key=nil)
     end
     puts
     list.each {|x| puts x}
+    puts "[option: -d dry_run]"
     puts "[option: -e allows editing the command before execution]"
     puts "[option: -v allows viewing the execution result]"
     puts "[option: -l swaps URL into localhost]"
@@ -158,6 +159,10 @@ end
 # 
 def options
     ARGV.select {|a| /^.+[\=]+.+$/ =~ a }
+end
+
+def dry_run?
+    ARGV.select {|a| a == "-d" }.first
 end
 
 def localhost?
@@ -293,13 +298,19 @@ end
 def verbs
   ARGV.select do |a|
       %w(
-        create
-        destroy
-        create_wc
-        add_card
-        list
-        get
-        update
+          create
+          destroy
+          create_wc
+          add_card
+          list
+          get
+          update
+          coib
+          coa
+          wcc
+          wc
+          capture
+          reverse
       ).include?(a)
   end.first    
 end
@@ -454,6 +465,18 @@ end
 # remove commented lines from the script file
 #
 command = script_body.lines.select { |line| !(line.start_with?("#")) }.join.chomp
+
+if dry_run?
+   if vim?
+       File.open(result_file_name, "w") do |f|
+           f.puts sentence
+       end
+       system "vim #{result_file_name}"
+   else
+       puts script_body
+   end  
+   abort  
+end
 
 #
 # this is the __main__ execution part

@@ -470,7 +470,7 @@ if dry_run?
    result_file_name = "curl_result.tmp"
    if vim?
        File.open(result_file_name, "w") do |f|
-           f.puts sentence
+           f.puts script_body
        end
        system "vim #{result_file_name}"
    else

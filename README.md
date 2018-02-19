@@ -1,6 +1,6 @@
 # Omi
 
-This repository is the easy demo tool of Omise API and tutorial how to use Omise.js
+omi does call Omise Api. Initially you need to go to [Omise Dashboard](https://dashboard.omise.co/test/keys) and copy its public | private key starts from `pkey_` `skey_`
 
 ## Instruction
 
@@ -8,14 +8,6 @@ Please do the following:
 ```
 $ bundle install
 ```
-
-## collecting_cards.html
-
-This file is the real example to demonstrate how to embed Omise.js to collect cards of your customers.
-
-## omi
-
-omi does call Omise Api. Initially you need to go to [Omise Dashboard](https://dashboard.omise.co/test/keys) and copy its public | private key starts from `pkey_` `skey_`
 
 ## setup
 
@@ -172,27 +164,6 @@ $ omi charge list
 
 et cetra. The others are in the help menu.
 
-## preparing the test environment
-
-1. execute the following script and obey the instructions
-
-```
-$ ./test_env/prepare
-```
-2. after 1. has been started, execute the following:
-
-```
-$ ./test_env/launch
-```
-
-3. then you have to go to (https://dashboard.omise.co/test/webhooks) and edit the endpoint such as:
-
-```
-https://[random hash].ngrok.io/omise/webhook
-```
-
-4. after that, you are going to execute whatever API command as you like.
-
 
 ## Local Host Execution (Only for Omise Developers)
 
@@ -207,9 +178,8 @@ or, simply you can call like this:
 
 Example:
 ```
-$ oml charge list [your skey|pkey of localhost]
+$ omil charge list [your skey|pkey of localhost]
 ```
-
 
 ## passing arbiterary (pkey|skey) as argument
 
@@ -236,6 +206,32 @@ When you get authentication failure from API, it means your command missing key 
 ```
 
 so just please add it to the last of the command.
+
+## collecting_cards.html
+
+This file is the real example to demonstrate how to embed Omise.js to collect cards of your customers.
+
+## preparing the test environment
+
+1. execute the following script and obey the instructions
+
+```
+$ ./test_env/prepare
+```
+2. after 1. has been started, execute the following:
+
+```
+$ ./test_env/launch
+```
+
+3. then you have to go to (https://dashboard.omise.co/test/webhooks) and edit the endpoint such as:
+
+```
+https://[random hash].ngrok.io/omise/webhook
+```
+
+4. after that, you are going to execute whatever API command as you like.
+
 
 ## Special Thanks
 Thanks to Mr. Akira Narita, it is possible to test the Omise Webhook API with his [omise-webhook](http://akinrt.hatenablog.com/entry/omise-webhook) module. If you quickly want to test Omise-Webhook API without launching SSL/TLS certificate enhancing https website, his repository helps you.

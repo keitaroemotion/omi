@@ -1,6 +1,9 @@
 # Omi
 
-omi does call Omise Api. Initially you need to go to [Omise Dashboard](https://dashboard.omise.co/test/keys) and copy its public | private key starts from `pkey_` `skey_`
+omi does call Omise Api. It enables you stay away from bunch of curl commands since
+this script builds everything for you automatically. In short, omi makes your Omise
+API Calling Process easy.
+
 
 ## Instruction
 
@@ -15,6 +18,8 @@ To install,
 ```
 $ ./installer
 ```
+
+Initially you need to go to [Omise Dashboard](https://dashboard.omise.co/test/keys) and copy its public | private key starts from `pkey_` `skey_`
 
 ```
 $ mkdir /usr/local/etc/omi/

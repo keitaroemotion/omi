@@ -467,6 +467,7 @@ end
 command = script_body.lines.select { |line| !(line.start_with?("#")) }.join.chomp
 
 if dry_run?
+   result_file_name = "curl_result.tmp"
    if vim?
        File.open(result_file_name, "w") do |f|
            f.puts sentence

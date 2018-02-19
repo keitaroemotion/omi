@@ -104,6 +104,12 @@ $ omi customer add_card token=[token_id]
 $ omi customer list
 ```
 
+or 
+
+```
+$ omi customers
+```
+
 #### get customer
 ```
 $ omi customer get
@@ -125,6 +131,13 @@ $ omi customer destroy
 ```
 $ omi card list customer=[customer_id]
 ```
+
+or
+
+```
+$ omi cards customer=[customer_id]
+```
+
 
 will automatically allow you to list the cards related to the customer_id.
 
@@ -167,6 +180,13 @@ $ omi card destroy
 $ omi charge list
 ```
 
+or
+
+```
+$ omi charges
+```
+
+
 et cetra. The others are in the help menu.
 
 
@@ -176,31 +196,31 @@ For Omise Developers, the option "-l" helps to access to its local instance (loc
 
 Example:
 ```
-$ omi charge list -l [your skey|pkey of localhost]
+$ omi charges -l [your skey|pkey of localhost]
 ```
 
 or, simply you can call like this:
 
 Example:
 ```
-$ omil charge list [your skey|pkey of localhost]
+$ omil charges [your skey|pkey of localhost]
 ```
 
 ## passing arbiterary (pkey|skey) as argument
 
 For instace, if you want use the specific skey instead of default one,
 ```
-$ omi charge list skey_... 
+$ omi charges skey_... 
 ```
 
 Or if pkey,
 ```
-$ omi charge list pkey_... 
+$ omi charges pkey_... 
 ```
 
 Or both,
 ```
-$ omi charge list pkey_... skey_...
+$ omi charges pkey_... skey_...
 ```
 
 ## Authentication Failure

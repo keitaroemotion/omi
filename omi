@@ -16,13 +16,16 @@
 
 require "colorize"
 
-APIS = %w(card charge customer dispute refund token recipient transfer)
+APIS        = %w(card charge customer dispute refund token recipient transfer)
+APIS_PLURAL = %w(cards charges customers disputes refunds tokens recipients transfers)
 RESOURCES   = "/usr/local/etc/omi"
 SCRIPTS     = "#{RESOURCES}/scripts"
 CONFIG_PATH = "#{RESOURCES}/config"
 
+@argv = ARGV.map { |a| APIS_PLURAL.include?(a) ? [a[0...-1], "list"] : a }.flatten
+
 def help(key=nil)
-    key = ARGV[1] unless key
+    key = @argv[1] unless key
     if key == "apis"
         puts
         APIS.each {|a| puts a}
@@ -32,9 +35,11 @@ def help(key=nil)
     list = [
         "omi [card    ]  destroy   ... destroy a card",
         "omi [card    ]  list      ... list_all_cards",
+        "omi [cards   ]            ... list_all_cards",
         "omi [card    ]  get       ... retrieve_a_card",
         "omi [card    ]  update    ... update_a_card",
         "omi [charge  ]  list      ... list all charges",
+        "omi [charges ]            ... list all charges",
         "omi [charge  ]  update    ... update_a_charge" ,
         "omi [charge  ]  reverse   ... reverse_an_uncaptured_charge",
         "omi [charge  ]  get       ... retrieve_a_charge",
@@ -49,21 +54,24 @@ def help(key=nil)
         "omi [customer]  create    ... create_a_customer",
         "omi [customer]  add_card  ... attach_a_card_to_customer",
         "omi [customer]  list      ... list_all_customers",
+        "omi [customers]           ... list_all_customers",
         "omi [customer]  get       ... retrieve_a_customer",
         "omi [customer]  update    ... update_a_customer",
-        "omi [dispute ]  list      ... list_all_disputes",
+        "omi [disputes]            ... list_all_disputes",
         "omi [dispute ]  lao       ... list_all_open_disputes",
         "omi [dispute ]  lap       ... list_all_pending_disputes",
         "omi [dispute ]  lac       ... list_all_closed_disputes",
         "omi [dispute ]  get       ... retrieve_a_dispute",
         "omi [dispute ]  update    ... update_a_dispute",
         "omi [recipient] list      ... list_all_recipient",
+        "omi [recipients]          ... list_all_recipient",
         "omi [recipient] create    ... create_a_recipient",
         "omi [recipient] get       ... retrieve_a_recipient",
         "omi [recipient] update    ... update_a_recipient",
         "omi [recipient] destroy   ... destroy_a_recipient" ,
         "omi [refund  ] create    ... create_a_refund",
         "omi [refund  ] list      ... list_all_refunds",
+        "omi [refunds ]           ... list_all_refunds",
         "omi [refund  ] lap       ... list_all_refunds_of_particular_charge",
         "omi [refund  ] get       ... retrieve_a_refund",
         "omi [token   ] create    ... create a token", 
@@ -72,6 +80,7 @@ def help(key=nil)
         "omi [transfer] cr3       ... create_a_transfer_to_third_party_recipient",
         "omi [transfer] destroy   ... destroy_a_transfer",
         "omi [transfer] list      ... list_all_transfers",
+        "omi [transfers]          ... list_all_transfers",
         "omi [transfer] get       ... retrieve_a_transfer",
         "omi [transfer] update    ... update_a_transfer",
         "omi [edit    ] [api_name] [key_word]",
@@ -89,13 +98,13 @@ def help(key=nil)
     abort
 end
 
-if %w(help --h -h).include?(ARGV[0])
+if %w(help --h -h).include?(@argv[0])
     help
 end
 HAS_EQUAL   = /^.+\=.+$/
 
 def get_options
-    list = ARGV
+    list = @argv
         .select { |a| a =~ HAS_EQUAL           }
         .map    { |a| a.split('=').map(&:to_s) }
         .flatten
@@ -103,7 +112,7 @@ def get_options
 end
 
 def vim?
-    ARGV.include?("--vim") || ARGV.include?("-v")
+    @argv.include?("--vim") || @argv.include?("-v")
 end
 
 options = get_options
@@ -124,7 +133,7 @@ def automate_key(keys, sym)
 end
 
 def get_keys
-    keys = ARGV.select {|a| /[ps]key_[\d\w\_\:]+/ =~ a }
+    keys = @argv.select {|a| /[ps]key_[\d\w\_\:]+/ =~ a }
     if keys.size > 0
         return {
             pkey: (keys.select{|a| /pkey/ =~ a }.first.to_s.strip.chomp),
@@ -151,29 +160,29 @@ end
 
 
 def args
-    ARGV.select {|a| /^[^\=]+$/ =~ a  && !APIS.include?(a) }
+    @argv.select {|a| /^[^\=]+$/ =~ a  && !APIS.include?(a) }
 end
 
 #
-# extract the [key]=[value] pair from the ARGV
+# extract the [key]=[value] pair from the @argv
 # 
 def options
-    ARGV.select {|a| /^.+[\=]+.+$/ =~ a }
+    @argv.select {|a| /^.+[\=]+.+$/ =~ a }
 end
 
 def dry_run?
-    ARGV.select {|a| a == "-d" }.first
+    @argv.select {|a| a == "-d" }.first
 end
 
 def localhost?
-    ARGV.include?("-l")
+    @argv.include?("-l")
 end
 
 #
-# extract the api optcode from the ARGV
+# extract the api optcode from the @argv
 #
 def api 
-    api = ARGV.select {|a| APIS.include?(a.strip) }
+    api = @argv.select {|a| APIS.include?(a.strip) }
     unless api.size > 0
         abort("\napi missing. please input any of the following:  \n\n#{APIS}\n\n")
     end
@@ -296,7 +305,7 @@ def get_script_path(key)
 end
 
 def verbs
-  ARGV.select do |a|
+  @argv.select do |a|
       %w(
           create
           destroy
@@ -320,7 +329,7 @@ script_body = File.read(script_path).gsub("$skey", skey).gsub("$pkey", pkey)
 
 #
 # gsub the $[key] parameter in script file 
-# into the value of ARGV option [key]=[value]
+# into the value of @argv option [key]=[value]
 #
 def gsub(key, script_body, options, config)
     if script_body.include?("$#{key}")
@@ -425,11 +434,11 @@ unless script_path.include?("curl -s")
 end
 
 def pre_edit?
-  ARGV.include?("-e")
+  @argv.include?("-e")
 end
 
 #
-# if the argument "-e" included in ARGV,
+# if the argument "-e" included in @argv,
 # command can be edited with vim editor before its execution.
 #
 if pre_edit?
@@ -458,7 +467,7 @@ unless /curl\s+\-s/ =~ script_body
 end
 
 def pre_edit?
-    ARGV.include?("-e")
+    @argv.include?("-e")
 end
 
 #
@@ -482,7 +491,7 @@ end
 #
 # remove -s from curl
 #
-if ARGV.include?("--rms")
+if @argv.include?("--rms")
   script_body = script_body.gsub("-s", "") 
   command     = command.gsub("-s", "")
 end
@@ -506,7 +515,7 @@ else
 
     shell_execution_result = `#{command}`
     puts "[Result]"
-    if shell_execution_result.include?("div")
+    if shell_execution_result.include?("<div")
       File.open("result.html", "w") do |f|
           f.puts(shell_execution_result)
       end

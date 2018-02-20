@@ -148,16 +148,20 @@ pkey        = config_hash["pkey"]
 
 keys = get_keys || {pkey: "", skey: ""}
 
-if keys[:pkey] != "" 
-    pkey = automate_key(keys, :pkey)
-    puts "key substitution: #{pkey}"
+def fill_key(keys, sym)
+    if keys[sym] != "" 
+        key = automate_key(keys, sym)
+        puts "key substitution: #{key}"
+    end
+    key
 end
 
-if keys[:skey] != ""
-    skey = automate_key(keys, :skey)
-    puts "key substitution: #{skey}"
-end
-
+#
+# if there are skey_ or pkey_ incoming arguments,
+# let it override the config_hash
+#
+pkey = fill_key(keys, :pkey)
+skey = fill_key(keys, :skey)
 
 def args
     @argv.select {|a| /^[^\=]+$/ =~ a  && !APIS.include?(a) }

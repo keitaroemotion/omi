@@ -290,8 +290,8 @@ def translate(api, key)
     result
 end
 
-def get_script_path(key)
-    script_path = "#{SCRIPTS}/#{api}/#{translate(api, key)}"
+def get_script_path(key, lang="curl")
+    script_path = "#{SCRIPTS}/#{lang}/#{api}/#{translate(api, key)}"
     unless File.exist?(script_path)
         abort("\nscript_path #{script_path} does not exist\n\n")
     end

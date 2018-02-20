@@ -290,8 +290,19 @@ def translate(api, key)
     result
 end
 
-def get_script_path(key, lang="curl")
-    script_path = "#{SCRIPTS}/#{lang}/#{api}/#{translate(api, key)}"
+def lang
+    languages = %w(ruby python java)
+    languages.each do |l|
+        if @argv.include?(l)
+            return l
+        end
+    end
+    nil
+end
+
+def get_script_path(key, language)
+    language ||= "curl"
+    script_path = "#{SCRIPTS}/#{language}/#{api}/#{translate(api, key)}"
     unless File.exist?(script_path)
         abort("\nscript_path #{script_path} does not exist\n\n")
     end
@@ -318,7 +329,7 @@ def verbs
     end.first    
 end
 
-script_path = get_script_path(verbs)
+script_path = get_script_path(verbs, lang)
 script_body = File.read(script_path)
                   .gsub("$skey", skey)
                   .gsub("$pkey", pkey)
@@ -494,12 +505,26 @@ if vim?
     print_tmp_file(sentence)
     system "vim #{result_file_name}"
 else
+    if lang == "curl"
+        shell_execution_result = `#{command}`
+    else
+        detail = {
+          ruby: ["rb", "gem install omise"]
+        }[lang.to_sym] || abort("language not supported")
+
+        tmp_exe = "tmp.#{detail[0]}"
+        system "#{detail[1]}"
+        File.open(tmp_exe, "w") do |f|
+          f.puts command 
+        end
+        shell_execution_result = `ruby #{tmp_exe}`
+        system "rm #{tmp_exe}"
+    end
     puts "-------------------------"
     puts "[Command]\n"
     puts command.green
     puts "-------------------------"
 
-    shell_execution_result = `#{command}`
     puts "[Result]"
     if shell_execution_result.include?("<div")
         print_tmp_file(shell_execution_result)

@@ -1,0 +1,14 @@
+#
+# gem install omise
+#
+
+require "omise"
+
+Omise.secret_api_key = "$skey"
+
+customer = Omise::Customer.create({
+  email: "john.doe@example.com",
+  description: "John Doe (id: 30)"
+})
+
+puts customer

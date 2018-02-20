@@ -1,19 +1,5 @@
 #!/usr/bin/env ruby
 
-#
-# YOU NEED TO USE API_CALLER SUCH AS:
-#
-# ./api_caller scripts/[your script you want]
-#
-# XXX might need Turing Incomplete features 
-#     such that enables executing the script files
-#     consecutively the former script passes the
-#     output to the latter.
-#
-# XXX might need to make this application installable  
-# XXX omi card destroy => authentication failure
-#
-
 require "colorize"
 
 APIS        = %w(card charge customer dispute refund token recipient transfer)
@@ -86,7 +72,7 @@ def help(key=nil)
         "omi [edit    ] [api_name] [key_word]",
     ]
     if key
-      list = list.select{|x| x.include?("omi [#{key}") }
+        list = list.select{|x| x.include?("omi [#{key}") }
     end
     puts
     list.each {|x| puts x}
@@ -307,29 +293,29 @@ end
 def get_script_path(key)
     script_path = "#{SCRIPTS}/#{api}/#{translate(api, key)}"
     unless File.exist?(script_path)
-      abort("\nscript_path #{script_path} does not exist\n\n")
+        abort("\nscript_path #{script_path} does not exist\n\n")
     end
     script_path
 end
 
 def verbs
-  @argv.select do |a|
-      %w(
-          create
-          destroy
-          create_wc
-          add_card
-          list
-          get
-          update
-          coib
-          coa
-          wcc
-          wc
-          capture
-          reverse
-      ).include?(a)
-  end.first    
+    @argv.select do |a|
+        %w(
+            create
+            destroy
+            create_wc
+            add_card
+            list
+            get
+            update
+            coib
+            coa
+            wcc
+            wc
+            capture
+            reverse
+        ).include?(a)
+    end.first    
 end
 
 script_path = get_script_path(verbs)
@@ -381,7 +367,7 @@ def secondary_api_call(script_body, skey, api, prefix, value)
     puts "[Secondary Command Call]: #{cmd.cyan}"
     result = `#{cmd}`
     if result.include?("authentication failed")
-      abort("\n\nauthentication failure: #{cmd}\n\n")
+        abort("\n\nauthentication failure: #{cmd}\n\n")
     end
     result
         .split("\n")
@@ -399,21 +385,21 @@ end
 #
 def list_values_and_gsub(script_body, skey, api, prefix, options, value="")
     if script_body.include?("$#{api}") 
-       list = secondary_api_call(script_body, skey, api, prefix, value)
-       if api == "customer" && options["customer"]
-           value = options["customer"]
-       else
-           if list.size == 0
-               abort("[#{api}]:               No record")
-           else  
-               list.each_with_index { |e, i| puts "[#{i}] #{e}" }
-               print "\n[which?][q:Quit] "    
-               input = $stdin.gets.chomp
-               abort if input.downcase == "q"
-               value = list[input.to_i]
-           end
-       end    
-       script_body = script_body.gsub("$#{api}", value)
+        list = secondary_api_call(script_body, skey, api, prefix, value)
+        if api == "customer" && options["customer"]
+            value = options["customer"]
+        else
+            if list.size == 0
+                abort("[#{api}]:               No record")
+            else  
+                list.each_with_index { |e, i| puts "[#{i}] #{e}" }
+                print "\n[which?][q:Quit] "    
+                input = $stdin.gets.chomp
+                abort if input.downcase == "q"
+                value = list[input.to_i]
+            end
+        end    
+        script_body = script_body.gsub("$#{api}", value)
     end
     [script_body, value]
 end
@@ -443,7 +429,7 @@ unless script_path.include?("curl -s")
 end
 
 def pre_edit?
-  @argv.include?("-e")
+    @argv.include?("-e")
 end
 
 #
@@ -451,11 +437,11 @@ end
 # command can be edited with vim editor before its execution.
 #
 if pre_edit?
-   tmp = ".tmp_file_omise"
-   File.open(tmp, "w") { |f| f.puts script_body }
-   system("vim #{tmp}")
-   script_body = File.read(tmp)
-   system("rm #{tmp}")
+    tmp = ".tmp_file_omise"
+    File.open(tmp, "w") { |f| f.puts script_body }
+    system("vim #{tmp}")
+    script_body = File.read(tmp)
+    system("rm #{tmp}")
 end
 
 unless /curl\s+\-s/ =~ script_body
@@ -503,10 +489,10 @@ end
 # this is the __main__ execution part
 #
 if vim?
-   result   = `#{script_body}`
-   sentence = "#{script_body.strip}\n\n#{result}"
-   print_tmp_file(sentence)
-   system "vim #{result_file_name}"
+    result   = `#{script_body}`
+    sentence = "#{script_body.strip}\n\n#{result}"
+    print_tmp_file(sentence)
+    system "vim #{result_file_name}"
 else
     puts "-------------------------"
     puts "[Command]\n"
@@ -516,13 +502,13 @@ else
     shell_execution_result = `#{command}`
     puts "[Result]"
     if shell_execution_result.include?("<div")
-      print_tmp_file(shell_execution_result)
-      system "open result.html"
-      abort
+        print_tmp_file(shell_execution_result)
+        system "open result.html"
+        abort
     else
         puts shell_execution_result
         if shell_execution_result.include?("authentication_failure")
-          puts "is your skey/pkey really correct?".red
+            puts "is your skey/pkey really correct?".red
         end
     end
 

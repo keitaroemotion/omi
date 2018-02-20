@@ -494,32 +494,47 @@ def print_tmp_file(sentence)
    File.open(result_file_name, "w") do |f|
        f.puts sentence
    end
+   result_file_name
+end
+
+@lang = lang
+
+def get_detail
+    {
+      ruby: ["rb", "gem install omise"]
+    }[@lang&.to_sym] || abort("language not supported")
+end
+
+if @lang
+    detail = get_detail
+else
+    @lang = "curl"
+end    
+
+def exec(command, detail)
+    if @lang == "curl"
+        shell_execution_result = `#{command}`
+    else
+        tmp_exe = "tmp.#{detail[0]}"
+        system "#{detail[1]}"
+        File.open(tmp_exe, "w") { |f| f.puts command }
+        shell_execution_result = `ruby #{tmp_exe}`
+        system "rm #{tmp_exe}"
+    end
+    shell_execution_result
 end
 
 #
 # this is the __main__ execution part
 #
 if vim?
-    result   = `#{script_body}`
+    # result   = `#{script_body}`
+    result = exec(command, detail)
     sentence = "#{script_body.strip}\n\n#{result}"
-    print_tmp_file(sentence)
+    result_file_name = print_tmp_file(sentence)
     system "vim #{result_file_name}"
 else
-    if lang == "curl"
-        shell_execution_result = `#{command}`
-    else
-        detail = {
-          ruby: ["rb", "gem install omise"]
-        }[lang.to_sym] || abort("language not supported")
-
-        tmp_exe = "tmp.#{detail[0]}"
-        system "#{detail[1]}"
-        File.open(tmp_exe, "w") do |f|
-          f.puts command 
-        end
-        shell_execution_result = `ruby #{tmp_exe}`
-        system "rm #{tmp_exe}"
-    end
+    shell_execution_result = exec(command, detail)
     puts "-------------------------"
     puts "[Command]\n"
     puts command.green

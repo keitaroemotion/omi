@@ -11,4 +11,4 @@ customer = Omise::Customer.create({
   description: "John Doe (id: 30)"
 })
 
-puts customer
+puts customer.inspect

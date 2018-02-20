@@ -496,16 +496,20 @@ if @argv.include?("--rms")
   command     = command.gsub("-s", "")
 end
 
-#
-# this is the __main__ execution part
-#
-if vim?
-   result           = `#{script_body}`
-   sentence         = "#{script_body.strip}\n\n#{result}"
+def print_tmp_file(sentence)
    result_file_name = "curl_result.tmp"
    File.open(result_file_name, "w") do |f|
        f.puts sentence
    end
+end
+
+#
+# this is the __main__ execution part
+#
+if vim?
+   result   = `#{script_body}`
+   sentence = "#{script_body.strip}\n\n#{result}"
+   print_tmp_file(sentence)
    system "vim #{result_file_name}"
 else
     puts "-------------------------"
@@ -516,9 +520,7 @@ else
     shell_execution_result = `#{command}`
     puts "[Result]"
     if shell_execution_result.include?("<div")
-      File.open("result.html", "w") do |f|
-          f.puts(shell_execution_result)
-      end
+      print_tmp_file(shell_execution_result)
       system "open result.html"
       abort
     else

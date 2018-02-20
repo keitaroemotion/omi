@@ -148,7 +148,7 @@ pkey        = config_hash["pkey"]
 
 keys = get_keys || {pkey: "", skey: ""}
 
-def fill_key(keys, sym)
+def fill_key(keys, sym, key)
     if keys[sym] != "" 
         key = automate_key(keys, sym)
         puts "key substitution: #{key}"
@@ -160,8 +160,8 @@ end
 # if there are skey_ or pkey_ incoming arguments,
 # let it override the config_hash
 #
-pkey = fill_key(keys, :pkey)
-skey = fill_key(keys, :skey)
+pkey = fill_key(keys, :pkey, pkey)
+skey = fill_key(keys, :skey, skey)
 
 def args
     @argv.select {|a| /^[^\=]+$/ =~ a  && !APIS.include?(a) }
@@ -305,7 +305,11 @@ def translate(api, key)
 end
 
 def get_script_path(key)
-    "#{SCRIPTS}/#{api}/#{translate(api, key)}"
+    script_path = "#{SCRIPTS}/#{api}/#{translate(api, key)}"
+    unless File.exist?(script_path)
+      abort("\nscript_path #{script_path} does not exist\n\n")
+    end
+    script_path
 end
 
 def verbs
@@ -329,7 +333,9 @@ def verbs
 end
 
 script_path = get_script_path(verbs)
-script_body = File.read(script_path).gsub("$skey", skey).gsub("$pkey", pkey)
+script_body = File.read(script_path)
+                  .gsub("$skey", skey)
+                  .gsub("$pkey", pkey)
 
 #
 # gsub the $[key] parameter in script file 
@@ -412,7 +418,6 @@ def list_values_and_gsub(script_body, skey, api, prefix, options, value="")
     [script_body, value]
 end
 
-
 #
 # XXX need this to be refactored as iteration
 #
@@ -452,19 +457,6 @@ if pre_edit?
    script_body = File.read(tmp)
    system("rm #{tmp}")
 end
-
-#
-# XXX need this to be refactored as iteration
-#
-script_body        = gsub("transfer", script_body, options, config_hash)
-script_body        = gsub("recipient", script_body, options, config_hash)
-script_body        = gsub("charge", script_body, options, config_hash)
-script_body        = gsub("token", script_body, options, config_hash)
-script_body        = gsub("dispute", script_body, options, config_hash)
-script_body        = gsub("amount", script_body, options, config_hash)
-script_body, value = list_values_and_gsub(script_body, skey, "customer", "cust_", options)
-script_body, value = list_values_and_gsub(script_body, skey, "charge", "chrg_", options, value)
-script_body, value = list_values_and_gsub(script_body, skey, "card", "card_", options, value)
 
 unless /curl\s+\-s/ =~ script_body
     script_body = script_body.gsub("curl", "curl -s")

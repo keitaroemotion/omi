@@ -122,7 +122,7 @@ $ omi customer update
 
 #### destory customer
 ```
-$ omi customer destroy
+$ omi customer delete
 ```
 
 ### [Card API](https://www.omise.co/cards-api)
@@ -171,7 +171,7 @@ $ omi card update
 
 if you want to delete the card,
 ```
-$ omi card destroy
+$ omi card delete
 ```
 
 ### [Charge API](https://www.omise.co/charges-api)

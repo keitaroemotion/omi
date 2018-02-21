@@ -19,7 +19,7 @@ def help(key=nil)
         abort
     end
     list = [
-        "omi [card    ]  destroy   ... destroy a card",
+        "omi [card    ]  delete    ... delete a card",
         "omi [card    ]  list      ... list_all_cards",
         "omi [cards   ]            ... list_all_cards",
         "omi [card    ]  get       ... retrieve_a_card",
@@ -35,7 +35,7 @@ def help(key=nil)
         "omi [charge  ]  wcc       ... charge_a_card_using_a_customer_and_a_card",
         "omi [charge  ]  wc        ... charge_a_card_using_a_customer",
         "omi [charge  ]  capture   ... capture_an_authorized_charge",
-        "omi [customer]  destroy   ... destroy a customer", 
+        "omi [customer]  delete    ... delete a customer", 
         "omi [customer]  create_wc ... create_a_customer_and_attach_a_card",
         "omi [customer]  create    ... create_a_customer",
         "omi [customer]  add_card  ... attach_a_card_to_customer",
@@ -54,7 +54,7 @@ def help(key=nil)
         "omi [recipient] create    ... create_a_recipient",
         "omi [recipient] get       ... retrieve_a_recipient",
         "omi [recipient] update    ... update_a_recipient",
-        "omi [recipient] destroy   ... destroy_a_recipient" ,
+        "omi [recipient] delete    ... delete_a_recipient" ,
         "omi [refund  ] create    ... create_a_refund",
         "omi [refund  ] list      ... list_all_refunds",
         "omi [refunds ]           ... list_all_refunds",
@@ -64,7 +64,7 @@ def help(key=nil)
         "omi [token   ] get       ... retrieve a token", 
         "omi [transfer] create    ... create_a_transfer",
         "omi [transfer] cr3       ... create_a_transfer_to_third_party_recipient",
-        "omi [transfer] destroy   ... destroy_a_transfer",
+        "omi [transfer] delete    ... delete_a_transfer",
         "omi [transfer] list      ... list_all_transfers",
         "omi [transfers]          ... list_all_transfers",
         "omi [transfer] get       ... retrieve_a_transfer",
@@ -184,7 +184,7 @@ end
 
 def translate_customer
     {
-        destroy:   "destroy_a_customer",
+        delete:    "destroy_a_customer",
         create_wc: "create_a_customer_and_attach_a_card",
         create:    "create_a_customer",
         add_card:  "attach_a_card_to_customer",
@@ -204,7 +204,7 @@ end
 
 def translate_card
     {
-        destroy:  "destroy_a_card",
+        delete:   "destroy_a_card",
         list:     "list_all_cards",
         list_all: "list_all_cards",
         get:      "retrieve_a_card",
@@ -246,7 +246,7 @@ def translate_recipient
         create:  "create_a_recipient",
         get:     "retrieve_a_recipient",
         update:  "update_a_recipient",
-        destroy: "destroy_a_recipient" 
+        delete:  "destroy_a_recipient" 
     }
 end
 
@@ -264,7 +264,7 @@ def translate_transfer
     {
         create:   "create_a_transfer",
         cr3:      "create_a_transfer_to_third_party_recipient",
-        destroy:  "destroy_a_transfer",
+        delete:   "destroy_a_transfer",
         list:     "list_all_transfers",
         get:      "retrieve_a_transfer",
         update:   "update_a_transfer",
@@ -316,7 +316,7 @@ def verbs
     @argv.select do |a|
         %w(
             create
-            destroy
+            delete
             create_wc
             add_card
             list

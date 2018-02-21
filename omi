@@ -303,7 +303,8 @@ def lang
     nil
 end
 
-def get_script_path(key, language)
+def get_script_path(key, language, psp)
+    psp      ||= "omise"
     language ||= "curl"
     script_path = "#{SCRIPTS}/#{language}/#{api}/#{translate(api, key)}"
     unless File.exist?(script_path)
@@ -332,7 +333,17 @@ def verbs
     end.first    
 end
 
-script_path = get_script_path(verbs, lang)
+def psp
+    psps = %w(omise stripe)
+    @argv.each do |a|
+        if psps.include?(a)
+            return a
+        end
+    end
+    nil
+end
+
+script_path = get_script_path(verbs, lang, psp)
 script_body = File.read(script_path)
                   .gsub("$skey", skey)
                   .gsub("$pkey", pkey)

@@ -174,7 +174,10 @@ end
 def api 
     api = @argv.select {|a| APIS.include?(a.strip) }
     unless api.size > 0
-        abort("\napi missing. please input any of the following:  \n\n#{APIS}\n\n")
+        puts "\napi missing. please input any of the following:\n\n"
+        APIS.each {|a| puts a}
+        puts
+        abort
     end
     api.first
 end

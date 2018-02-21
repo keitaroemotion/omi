@@ -8,7 +8,18 @@ RESOURCES   = "/usr/local/etc/omi"
 SCRIPTS     = "#{RESOURCES}/scripts"
 CONFIG_PATH = "#{RESOURCES}/config"
 
+def psp
+    psps = %w(omise stripe)
+    @argv.each do |a|
+        if psps.include?(a)
+            return a
+        end
+    end
+    "omise"
+end
+
 @argv = ARGV.map { |a| APIS_PLURAL.include?(a) ? [a[0...-1], "list"] : a }.flatten
+@psp = psp
 
 def help(key=nil)
     key = @argv[1] unless key
@@ -333,17 +344,7 @@ def verbs
     end.first    
 end
 
-def psp
-    psps = %w(omise stripe)
-    @argv.each do |a|
-        if psps.include?(a)
-            return a
-        end
-    end
-    nil
-end
-
-script_path = get_script_path(verbs, lang, psp)
+script_path = get_script_path(verbs, lang, @psp)
 script_body = File.read(script_path)
                   .gsub("$skey", skey)
                   .gsub("$pkey", pkey)
@@ -365,19 +366,30 @@ def gsub(key, script_body, options, config)
     script_body
 end        
 
+def api_root
+    root = {
+        omise:  "api.omise.co",
+        stripe: "api.stripe.com/v1"
+    }[@psp.to_sym]
+    abort("api root missing") unless root
+    root  
+end
+
 def host
-    localhost? ? "http://api.lvh.me:3000" : "https://api.omise.co"
+    localhost? ? "http://api.lvh.me:3000" : "https://#{api_root}"
 end
 
 #
 # XXX LITTLE BIT VERBOSE, NEEDS OPTIMIZATION HERE
 #
 def update_url_in_script_body(script, new_url)
-    subdomain = api.start_with?("token") ? "vault" : "api"
-    script = script.gsub("https://#{subdomain}.omise.co", new_url)
-    if api.start_with?("token")  
-        script = script.gsub("api.lvh.me:3000", "vault.lvh.me:4500")
-    end  
+    if @psp == "omise"
+        subdomain = api.start_with?("token") ? "vault" : "api"
+        script = script.gsub("https://#{subdomain}.omise.co", new_url)
+        if api.start_with?("token")  
+            script = script.gsub("api.lvh.me:3000", "vault.lvh.me:4500")
+        end  
+    end    
     script
 end
 

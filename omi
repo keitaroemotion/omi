@@ -1,5 +1,12 @@
 #!/usr/bin/env ruby
 
+#
+# This is the script to reduce the amount of work
+# when calling and interacting with the Omise API.
+#
+# Author: Kei Sugano <tobasojyo@gmail.com>
+#
+
 require "colorize"
 
 APIS        = %w(card charge customer dispute refund token recipient transfer)
@@ -8,18 +15,7 @@ RESOURCES   = "/usr/local/etc/omi"
 SCRIPTS     = "#{RESOURCES}/scripts"
 CONFIG_PATH = "#{RESOURCES}/config"
 
-def psp
-    psps = %w(omise stripe)
-    @argv.each do |a|
-        if psps.include?(a)
-            return a
-        end
-    end
-    "omise"
-end
-
 @argv = ARGV.map { |a| APIS_PLURAL.include?(a) ? [a[0...-1], "list"] : a }.flatten
-@psp = psp
 
 def help(key=nil)
     key = @argv[1] unless key
@@ -314,8 +310,7 @@ def lang
     nil
 end
 
-def get_script_path(key, language, psp)
-    psp      ||= "omise"
+def get_script_path(key, language)
     language ||= "curl"
     script_path = "#{SCRIPTS}/#{language}/#{api}/#{translate(api, key)}"
     unless File.exist?(script_path)
@@ -344,7 +339,7 @@ def verbs
     end.first    
 end
 
-script_path = get_script_path(verbs, lang, @psp)
+script_path = get_script_path(verbs, lang)
 script_body = File.read(script_path)
                   .gsub("$skey", skey)
                   .gsub("$pkey", pkey)
@@ -367,12 +362,7 @@ def gsub(key, script_body, options, config)
 end        
 
 def api_root
-    root = {
-        omise:  "api.omise.co",
-        stripe: "api.stripe.com/v1"
-    }[@psp.to_sym]
-    abort("api root missing") unless root
-    root  
+    "api.omise.co"
 end
 
 def host
@@ -383,13 +373,11 @@ end
 # XXX LITTLE BIT VERBOSE, NEEDS OPTIMIZATION HERE
 #
 def update_url_in_script_body(script, new_url)
-    if @psp == "omise"
-        subdomain = api.start_with?("token") ? "vault" : "api"
-        script = script.gsub("https://#{subdomain}.omise.co", new_url)
-        if api.start_with?("token")  
-            script = script.gsub("api.lvh.me:3000", "vault.lvh.me:4500")
-        end  
-    end    
+    subdomain = api.start_with?("token") ? "vault" : "api"
+    script = script.gsub("https://#{subdomain}.omise.co", new_url)
+    if api.start_with?("token")  
+        script = script.gsub("api.lvh.me:3000", "vault.lvh.me:4500")
+    end  
     script
 end
 
@@ -497,39 +485,39 @@ end
 command = script_body.lines.select { |line| !(line.start_with?("#")) }.join.chomp
 
 if dry_run?
-   result_file_name = "curl_result.tmp"
-   if vim?
-       File.open(result_file_name, "w") do |f|
-           f.puts script_body
-       end
-       system "vim #{result_file_name}"
-   else
-       puts script_body
-   end  
-   abort  
+    result_file_name = "curl_result.tmp"
+    if vim?
+        File.open(result_file_name, "w") do |f|
+            f.puts script_body
+        end
+        system "vim #{result_file_name}"
+    else
+        puts script_body
+    end  
+    abort  
 end
 
 #
 # remove -s from curl
 #
 if @argv.include?("--rms")
-  script_body = script_body.gsub("-s", "") 
-  command     = command.gsub("-s", "")
+    script_body = script_body.gsub("-s", "") 
+    command     = command.gsub("-s", "")
 end
 
 def print_tmp_file(sentence)
-   result_file_name = "curl_result.tmp"
-   File.open(result_file_name, "w") do |f|
-       f.puts sentence
-   end
-   result_file_name
+    result_file_name = "curl_result.tmp"
+    File.open(result_file_name, "w") do |f|
+        f.puts sentence
+    end
+    result_file_name
 end
 
 @lang = lang
 
 def get_detail
     {
-      ruby: ["rb", "gem install omise"]
+        ruby: ["rb", "gem install omise"]
     }[@lang&.to_sym] || abort("language not supported")
 end
 

@@ -1,6 +1,12 @@
 module Lib
     class Translation
         class << self
+            def translate_schedule
+              {
+                list: "list_all",
+              }
+            end
+
             def translate_customer
               {
                   delete:    "destroy_a_customer",

@@ -2,7 +2,7 @@
 
 #
 # This is the script to reduce the amount of work
-# when calling and interacting with the Omise API.
+# when calling and interacting with the Omise Lib::Const.API.
 #
 # Author: Kei Sugano <tobasojyo@gmail.com>
 #
@@ -10,21 +10,20 @@
 require "colorize"
 require "/usr/local/lib/omi/translation.rb"
 require "/usr/local/lib/omi/key.rb"
+require "/usr/local/lib/omi/const.rb"
 
-APIS        = %w(card charge customer dispute refund token recipient transfer)
-APIS_PLURAL = %w(cards charges customers disputes refunds tokens recipients transfers)
 RESOURCES   = "/usr/local/etc/omi"
 SCRIPTS     = "#{RESOURCES}/scripts"
 CONFIG_PATH = "#{RESOURCES}/config"
 HAS_EQUAL   = /^.+\=.+$/
 
-@argv = ARGV.map { |a| APIS_PLURAL.include?(a) ? [a[0...-1], "list"] : a }.flatten
+@argv = ARGV.map { |a| Lib::Const.apis_pl.include?(a) ? [a[0...-1], "list"] : a }.flatten
 
 def help(key=nil)
     key = @argv[1] unless key
     if key == "apis"
         puts
-        APIS.each {|a| puts a}
+        Lib::Const.apis.each {|a| puts a}
         puts
         abort
     end
@@ -79,6 +78,8 @@ def help(key=nil)
         "omi [transfers]          ... list_all_transfers",
         "omi [transfer] get       ... retrieve_a_transfer",
         "omi [transfer] update    ... update_a_transfer",
+        "omi [schedule] list      ... list_all_schedules",
+        "omi [schedules]          ... list_all_schedules",
         "omi [edit    ] [api_name] [key_word]",
     ]
     if key
@@ -118,7 +119,7 @@ skey        = Lib::Key.skey(keys, config_hash)
 pkey        = Lib::Key.pkey(keys, config_hash)
 
 def args
-    @argv.select {|a| /^[^\=]+$/ =~ a  && !APIS.include?(a) }
+    @argv.select {|a| /^[^\=]+$/ =~ a  && !Lib::Const.apis.include?(a) }
 end
 
 #
@@ -140,10 +141,10 @@ end
 # extract the api optcode from the @argv
 #
 def api 
-    api = @argv.select {|a| APIS.include?(a.strip) }
+    api = @argv.select {|a| Lib::Const.apis.include?(a.strip) }
     unless api.size > 0
         puts "\napi missing. please input any of the following:\n\n"
-        APIS.each {|a| puts a}
+        Lib::Const.apis.each {|a| puts a}
         puts
         abort
     end
@@ -164,9 +165,10 @@ def translate(api, key)
         dispute:   Lib::Translation.translate_dispute,
         refund:    Lib::Translation.translate_refund,
         recipient: Lib::Translation.translate_recipient,
-        transfer:  Lib::Translation.translate_transfer
+        transfer:  Lib::Translation.translate_transfer,
+        schedule:  Lib::Translation.translate_schedule,
     }[api.to_sym]
-    abort "api missing" unless api_translation 
+    abort "api translation missing of #{api}" unless api_translation 
     result = api_translation[(key || "").to_sym]
     help(api) unless result
     result

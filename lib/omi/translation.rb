@@ -3,7 +3,9 @@ module Lib
         class << self
             def translate_schedule
               {
-                list: "list_all",
+                list:         "list_all",
+                create_daily: "create_daily",
+                create_days_in_month: "create_days_in_month",
               }
             end
 

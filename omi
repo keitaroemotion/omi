@@ -17,7 +17,14 @@ SCRIPTS     = "#{RESOURCES}/scripts"
 CONFIG_PATH = "#{RESOURCES}/config"
 HAS_EQUAL   = /^.+\=.+$/
 
-@argv = ARGV.map { |a| Lib::Const.apis_pl.include?(a) ? [a[0...-1], "list"] : a }.flatten
+#
+# shortcut
+#
+@argv = ARGV.map do |a|  
+    a.gsub("sch", "schedule")
+end
+
+@argv = @argv.map { |a| Lib::Const.apis_pl.include?(a) ? [a[0...-1], "list"] : a }.flatten
 
 def help(key=nil)
     key = @argv[1] unless key
@@ -78,8 +85,10 @@ def help(key=nil)
         "omi [transfers]          ... list_all_transfers",
         "omi [transfer] get       ... retrieve_a_transfer",
         "omi [transfer] update    ... update_a_transfer",
-        "omi [schedule] list      ... list_all_schedules",
-        "omi [schedules]          ... list_all_schedules",
+        "omi [schedule] list           ... list_all_schedules",
+        "omi [schedules]               ... list_all_schedules",
+        "omi [schedules] create_daily  ... charge with days interval",
+        "omi [schedules] create_days_in_month ... charge with weekly interval (ex. Mon, Wed)",
         "omi [edit    ] [api_name] [key_word]",
     ]
     if key
@@ -170,7 +179,10 @@ def translate(api, key)
     }[api.to_sym]
     abort "api translation missing of #{api}" unless api_translation 
     result = api_translation[(key || "").to_sym]
-    help(api) unless result
+    if !result
+        puts "translation missing for #{key}".red
+        help(api)
+    end    
     result
 end
 
@@ -194,9 +206,11 @@ def get_script_path(key, language)
 end
 
 def verbs
-    @argv.select do |a|
+    verb = @argv.select do |a|
         %w(
             create
+            create_daily
+            create_days_in_month
             delete
             create_wc
             add_card
@@ -211,6 +225,10 @@ def verbs
             reverse
         ).include?(a)
     end.first    
+    if !verb
+      abort("you need to add verb".red)
+    end
+    verb
 end
 
 script_path = get_script_path(verbs, lang)
@@ -230,6 +248,28 @@ def gsub(key, script_body, options, config)
             script_body = script_body.gsub("$#{key}", config[key])  
         else
             abort "You need argument #{key}="
+        end
+        #
+        # additonal validation
+        #
+        if key == "every"
+            unless /^\d+$/ =~ options[key]
+              puts "every should be set as interger".red
+              abort
+            end
+        end
+        if key == "start_date"
+            unless /\d{4}-\d{2}-\d{2}/ =~ options[key]
+              puts "start_date should be set as yyyy-MM-dd".red
+              abort
+            end
+        end
+
+        if key == "end_date"
+            unless /\d{4}-\d{2}-\d{2}/ =~ options[key]
+              puts "end_date should be set as yyyy-MM-dd".red
+              abort
+            end
         end
     end
     script_body
@@ -308,12 +348,20 @@ end
 #
 # XXX need this to be refactored as iteration
 #
-script_body = gsub("transfer", script_body, options, config_hash)
-script_body = gsub("recipient", script_body, options, config_hash)
-script_body = gsub("charge", script_body, options, config_hash)
-script_body = gsub("token", script_body, options, config_hash)
-script_body = gsub("dispute", script_body, options, config_hash)
-script_body = gsub("amount", script_body, options, config_hash)
+%w(
+    transfer
+    recipient
+    charge
+    token
+    dispute
+    amount
+    every
+    start_date
+    end_date
+).each do |var|
+    script_body = gsub(var, script_body, options, config_hash)
+end
+
 script_body, value = list_values_and_gsub(script_body, skey, "customer", "cust_", options)
 script_body, value = list_values_and_gsub(script_body, skey, "charge", "chrg_", options, value)
 script_body, value = list_values_and_gsub(script_body, skey, "card", "card_", options, value)

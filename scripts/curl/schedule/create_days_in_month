@@ -1,0 +1,12 @@
+curl https://api.omise.co/schedules \
+  -X POST \
+  -u $skey: \
+  -d "every=1" \
+  -d "period=week" \
+  -d "on[weekdays][]=monday" \
+  -d "on[weekdays][]=friday" \
+  -d "start_date=$start_date" \
+  -d "end_date=$end_date" \
+  -d "charge[customer]=$customer" \
+  -d "charge[amount]=$amount" \
+  -d "charge[description]=Membership fee"

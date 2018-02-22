@@ -88,9 +88,9 @@ def help(key=nil)
         "omi [transfer] update    ... update_a_transfer",
         "omi [schedule] list            ... list_all_schedules",
         "omi [schedules]                ... list_all_schedules",
-        "omi [schedules] create_daily   ... charge with days interval",
-        "omi [schedules] create_weekly  ... charge with weekly interval (ex. Mon, Wed)",
-        "omi [schedules] create_zig_zag ... charge with inconsistent day per month",
+        "omi [schedule] create_daily   ... charge with days interval",
+        "omi [schedule] create_weekly  ... charge with weekly interval (ex. Mon, Wed)",
+        "omi [schedule] create_zig_zag ... charge with inconsistent day per month",
         "omi [edit    ] [api_name] [key_word]",
     ]
     if key
@@ -230,7 +230,7 @@ def verbs
             cr3
         ).include?(a)
     end.first    
-    verb || help
+    verb || help(api)
     verb
 end
 

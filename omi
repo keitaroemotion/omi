@@ -18,15 +18,7 @@ SCRIPTS     = "#{RESOURCES}/scripts"
 CONFIG_PATH = "#{RESOURCES}/config"
 HAS_EQUAL   = /^.+\=.+$/
 
-#
-# shortcut
-#
-@argv = ARGV.map do |a|  
-    a.gsub("sch", "schedule")
-     .gsub("cust", "customer")
-end
-
-@argv = @argv.map { |a| Lib::Const.apis_pl.include?(a) ? [a[0...-1], "list"] : a }.flatten
+@argv = ARGV.map { |a| Lib::Const.apis_pl.include?(a) ? [a[0...-1], "list"] : a }.flatten
 
 unless @argv
     abort("somehow argument is nil")

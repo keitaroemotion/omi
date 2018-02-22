@@ -85,10 +85,11 @@ def help(key=nil)
         "omi [transfers]          ... list_all_transfers",
         "omi [transfer] get       ... retrieve_a_transfer",
         "omi [transfer] update    ... update_a_transfer",
-        "omi [schedule] list           ... list_all_schedules",
-        "omi [schedules]               ... list_all_schedules",
-        "omi [schedules] create_daily  ... charge with days interval",
-        "omi [schedules] create_weekly ... charge with weekly interval (ex. Mon, Wed)",
+        "omi [schedule] list            ... list_all_schedules",
+        "omi [schedules]                ... list_all_schedules",
+        "omi [schedules] create_daily   ... charge with days interval",
+        "omi [schedules] create_weekly  ... charge with weekly interval (ex. Mon, Wed)",
+        "omi [schedules] create_zig_zag ... charge with inconsistent day per month",
         "omi [edit    ] [api_name] [key_word]",
     ]
     if key
@@ -211,6 +212,7 @@ def verbs
             create
             create_daily
             create_weekly
+            create_zig_zag
             delete
             create_wc
             add_card

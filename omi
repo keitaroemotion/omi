@@ -6,6 +6,9 @@
 #
 # Author: Kei Sugano <tobasojyo@gmail.com>
 #
+#
+# XXX add test cases
+#
 
 require "colorize"
 require "/usr/local/lib/omi/translation.rb"

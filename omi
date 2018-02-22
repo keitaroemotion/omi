@@ -575,7 +575,12 @@ else
         system "open result.html"
         abort
     else
-        puts shell_execution_result.gsub("security_code_check", "security_code_check".blue)
+        if shell_execution_result.include?("\"security_code_check\": false")
+            puts shell_execution_result.gsub(/("security_code_check"\:\sfalse)/, "\\1".red)
+            puts "[charge failed]".red
+        else
+            puts shell_execution_result
+        end    
         if shell_execution_result.include?("authentication_failure")
             puts "is your skey/pkey really correct?".red
         end

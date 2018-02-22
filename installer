@@ -1,4 +1,6 @@
 cp omi /usr/local/bin/
 cp omil /usr/local/bin/
 mkdir -p /usr/local/etc/omi
+mkdir -p /usr/local/lib/omi
 cp -r scripts /usr/local/etc/omi
+cp -r lib/omi/*  /usr/local/lib/omi

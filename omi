@@ -8,12 +8,15 @@
 #
 
 require "colorize"
+require "/usr/local/lib/omi/translation.rb"
+require "/usr/local/lib/omi/key.rb"
 
 APIS        = %w(card charge customer dispute refund token recipient transfer)
 APIS_PLURAL = %w(cards charges customers disputes refunds tokens recipients transfers)
 RESOURCES   = "/usr/local/etc/omi"
 SCRIPTS     = "#{RESOURCES}/scripts"
 CONFIG_PATH = "#{RESOURCES}/config"
+HAS_EQUAL   = /^.+\=.+$/
 
 @argv = ARGV.map { |a| APIS_PLURAL.include?(a) ? [a[0...-1], "list"] : a }.flatten
 
@@ -94,7 +97,6 @@ end
 if %w(help --h -h).include?(@argv[0])
     help
 end
-HAS_EQUAL   = /^.+\=.+$/
 
 def get_options
     list = @argv
@@ -110,51 +112,10 @@ end
 
 options = get_options
 
-abort "config file missing" unless File.exist?(CONFIG_PATH)
-
-def config
-    lines = File
-        .open(CONFIG_PATH, "r")
-        .each_line
-        .to_a
-        .select { |a| a =~ HAS_EQUAL } 
-    lines.map{ |line| line.split("=").map(&:chomp) }.flatten
-end
-
-def automate_key(keys, sym)
-    /[^\:]$/ =~ keys[sym] ? keys[sym] + ":" : keys[sym]
-end
-
-def get_keys
-    keys = @argv.select {|a| /[ps]key_[\d\w\_\:]+/ =~ a }
-    if keys.size > 0
-        return {
-            pkey: (keys.select{|a| /pkey/ =~ a }.first.to_s.strip.chomp),
-            skey: (keys.select{|a| /skey/ =~ a }.first.to_s.strip.chomp)
-        }  
-    end
-end
-
-config_hash = Hash[*(config)]
-skey        = config_hash["skey"]
-pkey        = config_hash["pkey"]
-
-keys = get_keys || {pkey: "", skey: ""}
-
-def fill_key(keys, sym, key)
-    if keys[sym] != "" 
-        key = automate_key(keys, sym)
-        puts "key substitution: #{key}"
-    end
-    key
-end
-
-#
-# if there are skey_ or pkey_ incoming arguments,
-# let it override the config_hash
-#
-pkey = fill_key(keys, :pkey, pkey)
-skey = fill_key(keys, :skey, skey)
+config_hash = Lib::Key.config_hash(CONFIG_PATH, HAS_EQUAL)
+keys        = Lib::Key.get_keys(@argv)
+skey        = Lib::Key.skey(keys, config_hash)
+pkey        = Lib::Key.pkey(keys, config_hash)
 
 def args
     @argv.select {|a| /^[^\=]+$/ =~ a  && !APIS.include?(a) }
@@ -189,95 +150,6 @@ def api
     api.first
 end
 
-def translate_customer
-    {
-        delete:    "destroy_a_customer",
-        create_wc: "create_a_customer_and_attach_a_card",
-        create:    "create_a_customer",
-        add_card:  "attach_a_card_to_customer",
-        list:      "list_all_customers",
-        list_all:  "list_all_customers",
-        get:       "retrieve_a_customer",
-        update:    "update_a_customer",
-    }
-end
-
-def translate_token
-    {
-        create: "create_a_token", 
-        get:    "retrieve_a_token",
-    }
-end
-
-def translate_card
-    {
-        delete:   "destroy_a_card",
-        list:     "list_all_cards",
-        list_all: "list_all_cards",
-        get:      "retrieve_a_card",
-        update:   "update_a_card",
-    }
-end
-
-def translate_charge
-    {
-        list:     "list_all_charges",
-        list_all: "list_all_charges",
-        update:   "update_a_charge", 
-        reverse:  "reverse_an_uncaptured_charge",
-        get:      "retrieve_a_charge",
-        coib:     "create_an_offsite_internet_banking_charge",
-        coa:      "create_an_offsite_alipay_charge",
-        wt:       "charge_a_card_using_a_token",
-        wcc:      "charge_a_card_using_a_customer_and_a_card",
-        wc:       "charge_a_card_using_a_customer",
-        capture:  "capture_an_authorized_charge",
-    }
-end
-
-def translate_dispute
-    {
-        list:     "list_all_disputes",
-        list_all: "list_all_disputes",
-        lao:      "list_all_open_disputes",
-        lap:      "list_all_pending_disputes",
-        lac:      "list_all_closed_disputes",
-        get:      "retrieve_a_dispute",
-        update:   "update_a_dispute",
-    }
-end
-
-def translate_recipient
-    {
-        list:    "list_all_recipient",
-        create:  "create_a_recipient",
-        get:     "retrieve_a_recipient",
-        update:  "update_a_recipient",
-        delete:  "destroy_a_recipient" 
-    }
-end
-
-def translate_refund
-    {
-        list:     "list_all_refunds",
-        list_all: "list_all_refunds",
-        lap:      "list_all_refunds_of_particular_charge",
-        get:      "retrieve_a_refund",
-        create:   "create_a_refund",
-    }
-end
-
-def translate_transfer
-    {
-        create:   "create_a_transfer",
-        cr3:      "create_a_transfer_to_third_party_recipient",
-        delete:   "destroy_a_transfer",
-        list:     "list_all_transfers",
-        get:      "retrieve_a_transfer",
-        update:   "update_a_transfer",
-    }
-end
-
 #
 # Mapping function such as:
 #
@@ -285,14 +157,14 @@ end
 #
 def translate(api, key)
     api_translation = {
-        charge:    translate_charge,
-        card:      translate_card,
-        customer:  translate_customer,
-        token:     translate_token,
-        dispute:   translate_dispute,
-        refund:    translate_refund,
-        recipient: translate_recipient,
-        transfer:  translate_transfer
+        charge:    Lib::Translation.translate_charge,
+        card:      Lib::Translation.translate_card,
+        customer:  Lib::Translation.translate_customer,
+        token:     Lib::Translation.translate_token,
+        dispute:   Lib::Translation.translate_dispute,
+        refund:    Lib::Translation.translate_refund,
+        recipient: Lib::Translation.translate_recipient,
+        transfer:  Lib::Translation.translate_transfer
     }[api.to_sym]
     abort "api missing" unless api_translation 
     result = api_translation[(key || "").to_sym]

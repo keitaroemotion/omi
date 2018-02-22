@@ -223,6 +223,15 @@ Or both,
 $ omi charges pkey_... skey_...
 ```
 
+## Count function
+
+when you add `count` as argument, it is going to
+yield the size of the result record.
+
+```
+$ omi charges count
+```
+
 ## Authentication Failure
 When you get authentication failure from API, it means your command missing key parameter.
 

@@ -102,6 +102,7 @@ def help(key=nil)
     puts "[option: -e allows editing the command before execution]"
     puts "[option: -v allows viewing the execution result]"
     puts "[option: -l swaps URL into localhost]"
+    puts "[option: count counts the number of result records]"
     puts
     abort
 end
@@ -441,6 +442,8 @@ else
         if shell_execution_result.include?("\"security_code_check\": false")
             puts shell_execution_result.gsub(/("security_code_check"\:\sfalse)/, "\\1".red)
             puts "[charge failed]".red
+        elsif @argv.include?("count")
+            puts "Total: #{JSON.parse(shell_execution_result)["data"].size}"    
         else
             puts shell_execution_result
         end    

@@ -2,12 +2,13 @@ module Lib
     class Translation
         class << self
             def translate_schedule
-              {
-                list:           "list_all",
-                create_daily:   "create_daily",
-                create_weekly:  "create_weekly",
-                create_zig_zag: "create_zig_zag",
-              }
+                {
+                    list:           "list_all",
+                    create_daily:   "create_daily",
+                    create_weekly:  "create_weekly",
+                    create_zig_zag: "create_zig_zag",
+                    delete:         "destroy", 
+                }
             end
 
             def translate_customer

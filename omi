@@ -11,6 +11,7 @@ require "colorize"
 require "/usr/local/lib/omi/translation.rb"
 require "/usr/local/lib/omi/key.rb"
 require "/usr/local/lib/omi/const.rb"
+require "/usr/local/lib/omi/find.rb"
 
 RESOURCES   = "/usr/local/etc/omi"
 SCRIPTS     = "#{RESOURCES}/scripts"
@@ -22,9 +23,14 @@ HAS_EQUAL   = /^.+\=.+$/
 #
 @argv = ARGV.map do |a|  
     a.gsub("sch", "schedule")
+     .gsub("cust", "customer")
 end
 
 @argv = @argv.map { |a| Lib::Const.apis_pl.include?(a) ? [a[0...-1], "list"] : a }.flatten
+
+unless @argv
+    abort("somehow argument is nil")
+end
 
 def help(key=nil)
     key = @argv[1] unless key
@@ -227,9 +233,6 @@ def verbs
             reverse
         ).include?(a)
     end.first    
-    if !verb
-      abort("you need to add verb".red)
-    end
     verb
 end
 
@@ -297,56 +300,6 @@ def update_url_in_script_body(script, new_url)
     script
 end
 
-def secondary_api_call(script_body, skey, api, prefix, value)
-    puts
-    if api == "card"
-        puts api
-        cmd = "curl -s -X GET #{host}/customers/#{value}/cards -u #{skey}"
-    else    
-        cmd = "curl -s -X GET #{host}/#{api}s -u #{skey}"
-    end
-    puts "[Secondary Command Call]: #{cmd.cyan}"
-    result = `#{cmd}`
-    if result.include?("authentication failed")
-        abort("\n\nauthentication failure: #{cmd}\n\n")
-    end
-    result
-        .split("\n")
-        .select { |a| a.include?(prefix) }
-        .map    { |a| /#{prefix}[a-z0-9_]+/.match(a).to_s.strip }
-        .uniq
-end
-
-#
-# XXX needs to be refactored
-#
-# if specific parameter is missing, this script enlist the
-# existing values, then, let user choose the one,
-# and eventually this value is assigned to the main script_body
-#
-def list_values_and_gsub(script_body, skey, api, prefix, options, value="")
-    if script_body.include?("$#{api}") 
-        list = secondary_api_call(script_body, skey, api, prefix, value)
-        if api == "customer" && options["customer"]
-            value = options["customer"]
-        else
-            if list.size == 0
-                abort("[#{api}]:               No record")
-            elsif list.size == 1    
-                value = list[0]
-            else  
-                list.each_with_index { |e, i| puts "[#{i}] #{e}" }
-                print "\n[which?][q:Quit] "    
-                input = $stdin.gets.chomp
-                abort if input.downcase == "q"
-                value = list[input.to_i]
-            end
-        end    
-        script_body = script_body.gsub("$#{api}", value)
-    end
-    [script_body, value]
-end
-
 #
 # XXX need this to be refactored as iteration
 #
@@ -364,9 +317,10 @@ end
     script_body = gsub(var, script_body, options, config_hash)
 end
 
-script_body, value = list_values_and_gsub(script_body, skey, "customer", "cust_", options)
-script_body, value = list_values_and_gsub(script_body, skey, "charge", "chrg_", options, value)
-script_body, value = list_values_and_gsub(script_body, skey, "card", "card_", options, value)
+script_body, value = Lib::Find.fit(script_body, skey, "customer", "cust_", options, host)
+script_body, value = Lib::Find.fit(script_body, skey, "charge", "chrg_", options, host, value)
+script_body, value = Lib::Find.fit(script_body, skey, "card", "card_", options, host, value)
+script_body, value = Lib::Find.fit(script_body, skey, "schedule", "schd_", options, host, value)
 
 #
 # script_body update

@@ -1,0 +1,4 @@
+curl https://api.omise.co/schedules/$schedule \
+  -X DELETE \
+  -u $skey:
+

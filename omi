@@ -428,6 +428,8 @@ def list_values_and_gsub(script_body, skey, api, prefix, options, value="")
         else
             if list.size == 0
                 abort("[#{api}]:               No record")
+            elsif list.size == 1    
+                value = list[0]
             else  
                 list.each_with_index { |e, i| puts "[#{i}] #{e}" }
                 print "\n[which?][q:Quit] "    
@@ -567,12 +569,13 @@ else
     puts "-------------------------"
 
     puts "[Result]"
+
     if shell_execution_result.include?("<div")
         print_tmp_file(shell_execution_result)
         system "open result.html"
         abort
     else
-        puts shell_execution_result
+        puts shell_execution_result.gsub("security_code_check", "security_code_check".blue)
         if shell_execution_result.include?("authentication_failure")
             puts "is your skey/pkey really correct?".red
         end

@@ -22,7 +22,7 @@ module Lib
             # XXX at this point this filter does eliminate status: deleted
             #     record but in the near future this should be optional
             #
-            def fit_map(result, prefix)
+            def fit_map(result, prefix, is_data=true)
                 result["data"]
                   .select { |a| a["status"] != "deleted" }
                   .map {|a| a.to_s.gsub(/=>/, ": ") }

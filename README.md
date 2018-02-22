@@ -232,6 +232,13 @@ yield the size of the result record.
 $ omi charges count
 ```
 
+## Rich output option
+
+```
+$ omi charges rich
+```
+this converts the raw JSON output into more syntax highlighted compact output
+
 ## Authentication Failure
 When you get authentication failure from API, it means your command missing key parameter.
 

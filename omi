@@ -103,6 +103,7 @@ def help(key=nil)
     puts "[option: -v allows viewing the execution result]"
     puts "[option: -l swaps URL into localhost]"
     puts "[option: count counts the number of result records]"
+    puts "[option: rich enables rich output]"
     puts
     abort
 end
@@ -444,7 +445,12 @@ else
             puts "[charge failed]".red
         elsif @argv.include?("count")
             puts "Total: #{JSON.parse(shell_execution_result)["data"].size}"    
-        else
+        elsif @argv.include?("rich")
+            Lib::Find.fit_map(JSON.parse(shell_execution_result), "chrg_").each do |x|
+                puts x
+                puts
+            end
+        else    
             puts shell_execution_result
         end    
         if shell_execution_result.include?("authentication_failure")

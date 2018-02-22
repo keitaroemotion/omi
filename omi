@@ -182,7 +182,7 @@ def translate(api, key)
     abort "api translation missing of #{api}" unless api_translation 
     result = api_translation[(key || "").to_sym]
     if !result
-        puts "translation missing for #{key}".red
+        puts "translation missing for key: #{key}".red
         help(api)
     end    
     result
@@ -226,8 +226,10 @@ def verbs
             wc
             capture
             reverse
+            cr3
         ).include?(a)
     end.first    
+    verb || help
     verb
 end
 
@@ -300,7 +302,6 @@ end
 #
 %w(
     transfer
-    recipient
     charge
     token
     dispute
@@ -312,6 +313,7 @@ end
     script_body = gsub(var, script_body, options, config_hash)
 end
 
+script_body, value = Lib::Find.fit(script_body, skey, "recipient", "recp_", options, host)
 script_body, value = Lib::Find.fit(script_body, skey, "customer", "cust_", options, host)
 script_body, value = Lib::Find.fit(script_body, skey, "charge", "chrg_", options, host, value)
 script_body, value = Lib::Find.fit(script_body, skey, "card", "card_", options, host, value)

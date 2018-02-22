@@ -1,5 +1,5 @@
 curl https://api.omise.co/transfers \
   -X POST \
   -u $skey \
-  -d "amount=100" \
+  -d "amount=$amount" \
   -d "recipient=$recipient"

@@ -87,11 +87,13 @@ def help(key=nil)
         "omi [transfers]          ... list_all_transfers",
         "omi [transfer] get       ... retrieve_a_transfer",
         "omi [transfer] update    ... update_a_transfer",
-        "omi [schedule] list            ... list_all_schedules",
-        "omi [schedules]                ... list_all_schedules",
+        "omi [schedule] list           ... list_all_schedules",
+        "omi [schedules]               ... list_all_schedules",
         "omi [schedule] create_daily   ... charge with days interval",
         "omi [schedule] create_weekly  ... charge with weekly interval (ex. Mon, Wed)",
         "omi [schedule] create_zig_zag ... charge with inconsistent day per month",
+        "omi [trsch]    list           ... list all transfer schedules",
+        "omi [trschs]                  ... list all transfer schedules",
         "omi [edit    ] [api_name] [key_word]",
     ]
     if key
@@ -181,6 +183,7 @@ def translate(api, key)
         recipient: Lib::Translation.translate_recipient,
         transfer:  Lib::Translation.translate_transfer,
         schedule:  Lib::Translation.translate_schedule,
+        trsch:     Lib::Translation.translate_trsch,
     }[api.to_sym]
     abort "api translation missing of #{api}" unless api_translation 
     result = api_translation[(key || "").to_sym]
@@ -204,6 +207,7 @@ end
 def get_script_path(key, language)
     language ||= "curl"
     script_path = "#{SCRIPTS}/#{language}/#{api}/#{translate(api, key)}"
+                      .gsub("trsch", "transfer_schedules")
     unless File.exist?(script_path)
         abort("\nscript_path #{script_path} does not exist\n\n")
     end

@@ -12,6 +12,7 @@ module Lib
                   recipient
                   transfer
                   schedule
+                  trsch
                 )
             end    
 
@@ -26,6 +27,7 @@ module Lib
                   recipients
                   transfers
                   schedules
+                  trschs
                 )
             end    
         end    

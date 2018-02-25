@@ -1,0 +1,2 @@
+curl -X GET https://api.omise.co/transfers/schedules \
+  -u $skey

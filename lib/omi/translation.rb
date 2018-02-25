@@ -4,6 +4,7 @@ module Lib
             def translate_trsch
                 {
                     list:           "list_all",
+                    list_of_recp:   "list_of_recp",
                 }
             end
 

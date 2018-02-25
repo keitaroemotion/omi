@@ -225,6 +225,7 @@ def verbs
             create_wc
             add_card
             list
+            list_of_recp
             get
             update
             coib

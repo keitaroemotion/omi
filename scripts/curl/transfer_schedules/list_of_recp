@@ -1,0 +1,5 @@
+#
+# LIST ALL TRANSFER SCHEDULES FOR A GIVEN RECIPIENT
+#
+curl https://api.omise.co/recipients/$recipient/schedules \
+  -u $skey

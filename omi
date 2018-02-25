@@ -11,6 +11,7 @@
 #
 
 require "colorize"
+require "date"
 require "/usr/local/lib/omi/translation.rb"
 require "/usr/local/lib/omi/key.rb"
 require "/usr/local/lib/omi/const.rb"
@@ -251,28 +252,37 @@ def gsub(key, script_body, options, config)
         elsif config[key]    
             script_body = script_body.gsub("$#{key}", config[key])  
         else
-            abort "You need argument #{key}="
+            #
+            # DEFAULT VALUE SET
+            #
+            if key == "start_date"
+                return script_body.gsub("$#{key}", DateTime.now.to_s[0...10])  
+            elsif key == "end_date"
+                return script_body.gsub("$#{key}", (DateTime.now.next_day(36500)).to_s[0...10])  
+            else    
+                abort "You need argument #{key}="
+            end
         end
         #
         # additonal validation
         #
         if key == "every"
             unless /^\d+$/ =~ options[key]
-              puts "every should be set as interger".red
-              abort
+                puts "every should be set as interger".red
+                abort
             end
         end
         if key == "start_date"
             unless /\d{4}-\d{2}-\d{2}/ =~ options[key]
-              puts "start_date should be set as yyyy-MM-dd".red
-              abort
+                puts "start_date should be set as yyyy-MM-dd".red
+                abort
             end
         end
 
         if key == "end_date"
             unless /\d{4}-\d{2}-\d{2}/ =~ options[key]
-              puts "end_date should be set as yyyy-MM-dd".red
-              abort
+                puts "end_date should be set as yyyy-MM-dd".red
+                abort
             end
         end
     end

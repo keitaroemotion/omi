@@ -5,6 +5,7 @@ module Lib
                 {
                     create_daily:   "create_daily",
                     create_weekly:  "create_weekly",
+                    create_zig_zag: "create_zig_zag",
                     list:           "list_all",
                     list_of_recp:   "list_of_recp",
                 }

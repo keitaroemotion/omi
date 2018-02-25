@@ -95,7 +95,8 @@ def help(key=nil)
         "omi [trsch]    list           ... list all transfer schedules",
         "omi [trschs]                  ... list all transfer schedules",
         "omi [trsch]    list_of_recp   ... list all transfer schedules of given recipient",
-        "omi [trsch]    create_daily   ... create a transfer schedule",
+        "omi [trsch]    create_daily   ... create a daily transfer schedule",
+        "omi [trsch]    create_weekly  ... create a weekly transfer schedule",
         "omi [edit    ] [api_name] [key_word]",
     ]
     if key
@@ -328,6 +329,7 @@ end
     every
     start_date
     end_date
+    %
 ).each do |var|
     script_body = gsub(var, script_body, options, config_hash)
 end

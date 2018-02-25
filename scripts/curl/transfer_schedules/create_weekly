@@ -1,0 +1,11 @@
+curl https://api.omise.co/schedules \
+  -X POST \
+  -u $skey \
+  -d "every=$every" \
+  -d "period=week" \
+  -d "on[weekdays][]=monday" \
+  -d "on[weekdays][]=friday" \
+  -d "start_date=$start_date" \
+  -d "end_date=$end_date" \
+  -d "transfer[recipient]=$recipient" \
+  -d "transfer[percentage_of_balance]=$%"

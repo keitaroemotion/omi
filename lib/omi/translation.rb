@@ -4,6 +4,7 @@ module Lib
             def translate_trsch
                 {
                     create_daily:   "create_daily",
+                    create_weekly:  "create_weekly",
                     list:           "list_all",
                     list_of_recp:   "list_of_recp",
                 }

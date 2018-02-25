@@ -1,0 +1,9 @@
+curl https://api.omise.co/schedules \
+  -X POST \
+  -u  $skey \
+  -d "every=$every" \
+  -d "period=day" \
+  -d "start_date=$start_date" \
+  -d "end_date=$end_date" \
+  -d "transfer[recipient]=$recipient" \
+  -d "transfer[amount]=$amount"

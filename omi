@@ -224,6 +224,7 @@ def verbs
             create
             create_daily
             create_weekly
+            create_monthly
             create_zig_zag
             delete
             create_wc

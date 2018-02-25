@@ -1,0 +1,9 @@
+curl https://api.omise.co/schedules \
+    -X POST \
+    -u $skey \
+    -d "every=1" \
+    -d "period=month" \
+    -d "on[weekday_of_month]=2nd_monday" \
+    -d "start_date=$start_date" \
+    -d "end_date=$end_date" \
+    -d "transfer[recipient]=$recipient"

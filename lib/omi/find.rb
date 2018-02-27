@@ -23,8 +23,7 @@ module Lib
             #     record but in the near future this should be optional
             #
             def fit_map(result, prefix, is_data=true)
-                result["data"]
-                  .select { |a| a["status"] != "deleted" }
+                result
                   .map {|a| a.to_s.gsub(/=>/, ": ") }
                   .map {|a| a.to_s.gsub(/(#{prefix}[^"]+)/, "\\1".blue) }
                   .map {|a| a.to_s.gsub(/([^{}:\s]+:)/, "\\1".magenta) }
@@ -49,11 +48,15 @@ module Lib
                         elsif list["data"].size == 1    
                             value = list["data"][0]["id"]
                         else  
+                            list = list["data"].select { |a| a["status"] != "deleted" }
                             fit_map(list, prefix).each_with_index { |e, i| puts "[#{i}] #{e}\n"; puts }
                             print "\n[which?][q:Quit] "    
                             input = $stdin.gets.chomp
                             abort if input.downcase == "q"
-                            value = list["data"][input.to_i]["id"]
+                            if list.size <= input.to_i
+                              abort("index out of range.")
+                            end
+                            value = list[input.to_i]["id"]
                         end
                     end    
                     script_body = script_body.gsub("$#{api}", value)

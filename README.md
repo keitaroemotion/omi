@@ -235,7 +235,7 @@ $ omi charges count
 ## Rich output option
 
 ```
-$ omi charges rich
+$ omi charges --rich
 ```
 this converts the raw JSON output into more syntax highlighted compact output
 

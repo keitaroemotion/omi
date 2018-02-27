@@ -18,6 +18,7 @@ module Lib
                     create_daily:   "create_daily",
                     create_weekly:  "create_weekly",
                     create_zig_zag: "create_zig_zag",
+                    create_monthly: "create_monthly",
                     delete:         "destroy", 
                 }
             end

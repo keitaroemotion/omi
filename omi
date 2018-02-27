@@ -89,9 +89,10 @@ def help(key=nil)
         "omi [transfer] update    ... update_a_transfer",
         "omi [schedule] list           ... list_all_schedules",
         "omi [schedules]               ... list_all_schedules",
-        "omi [schedule] create_daily   ... charge with days interval",
-        "omi [schedule] create_weekly  ... charge with weekly interval (ex. Mon, Wed)",
-        "omi [schedule] create_zig_zag ... charge with inconsistent day per month",
+        "omi [schedule] create_daily    ... charge with days interval",
+        "omi [schedule] create_weekly   ... charge with weekly interval (ex. Mon, Wed)",
+        "omi [schedule] create_monthly  ... charge with monthly interval",
+        "omi [schedule] create_zig_zag  ... charge with inconsistent day per month",
         "omi [trsch]    list           ... list all transfer schedules",
         "omi [trschs]                  ... list all transfer schedules",
         "omi [trsch]    list_of_recp   ... list all transfer schedules of given recipient",
@@ -328,6 +329,7 @@ end
     token
     dispute
     amount
+    day
     every
     start_date
     end_date

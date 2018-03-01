@@ -248,7 +248,7 @@ When you get authentication failure from API, it means your command missing key 
 
 so just please add it to the last of the command.
 
-## Scenario execution such as DSL
+## Scenario execution DSL
 
 You can define the DSL scenario to preserve the combined execution of
 omi script. It also preserves the response object such as:

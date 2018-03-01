@@ -24,7 +24,9 @@ story_path = get_story_path
 
 def process_echo(instruction)
   if instruction.start_with?("echo ")
+    puts
     puts(instruction.gsub("echo ", "").chomp)
+    puts
   end
 end
 
@@ -64,7 +66,9 @@ result = ""
 hash   = {}
 
 File.open(story_path, "r").each do |instruction|
-  process_echo(instruction)
-  result = process_omi(instruction, hash, result)
-  hash   = assign(instruction, result, hash)
+  if !(instruction.start_with?("#") && instruction.strip.chomp)
+    process_echo(instruction)
+    result = process_omi(instruction, hash, result)
+    hash   = assign(instruction, result, hash)
+  end
 end

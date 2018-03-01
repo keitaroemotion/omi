@@ -2,13 +2,11 @@
 
 def get_pkey
   key = ARGV.select{ |a| a.start_with?("pkey_") }.first 
-  abort("pkey missing") unless key
   key
 end
 
 def get_skey
   key = ARGV.select{ |a| a.start_with?("skey_") }.first 
-  abort("skey missing") unless key
   key
 end
 
@@ -24,9 +22,9 @@ story_path = get_story_path
 
 def process_echo(instruction)
   if instruction.start_with?("echo ")
-    puts
+    puts("\n---------------------------------------------------\n\n") 
     puts(instruction.gsub("echo ", "").chomp)
-    puts
+    puts("\n---------------------------------------------------") 
   end
 end
 

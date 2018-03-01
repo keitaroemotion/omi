@@ -16,6 +16,7 @@ require "/usr/local/lib/omi/translation.rb"
 require "/usr/local/lib/omi/key.rb"
 require "/usr/local/lib/omi/const.rb"
 require "/usr/local/lib/omi/find.rb"
+require "/usr/local/lib/omi/scenario.rb"
 
 RESOURCES   = "/usr/local/etc/omi"
 SCRIPTS     = "#{RESOURCES}/scripts"
@@ -23,6 +24,11 @@ CONFIG_PATH = "#{RESOURCES}/config"
 HAS_EQUAL   = /^.+\=.+$/
 
 @argv = ARGV.map { |a| Lib::Const.apis_pl.include?(a) ? [a[0...-1], "list"] : a }.flatten
+
+if @argv.include?("scenario")
+  Lib::Scenario.execute
+  abort
+end
 
 unless @argv
     abort("somehow argument is nil")

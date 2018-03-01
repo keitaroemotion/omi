@@ -49,7 +49,13 @@ module Lib
           end
         end
       end
-      
+     
+      def process_shell(instruction)
+        if instruction.start_with?("shell:")
+          system instruction.gsub("shell:", "")
+        end
+      end
+
       def process_omi(instruction, hash, result)
         if instruction.start_with?("omi ")
           hash.each do |k, v|
@@ -101,6 +107,7 @@ module Lib
             abort
           end
           if !(instruction.start_with?("#") && instruction.strip.chomp)
+            process_shell(instruction)
             process_echo(instruction)
             result = process_omi(instruction, hash, result)
             hash   = assign(instruction, result, hash)

@@ -1,0 +1,70 @@
+#!/usr/bin/env ruby
+
+def get_pkey
+  key = ARGV.select{ |a| a.start_with?("pkey_") }.first 
+  abort("pkey missing") unless key
+  key
+end
+
+def get_skey
+  key = ARGV.select{ |a| a.start_with?("skey_") }.first 
+  abort("skey missing") unless key
+  key
+end
+
+def get_story_path
+  path = ARGV.select{ |a| File.exist?(a) && a.end_with?(".story") }.first
+  abort("story_path missing") unless path
+  path
+end
+
+pkey       = get_pkey
+skey       = get_skey
+story_path = get_story_path
+
+def process_echo(instruction)
+  if instruction.start_with?("echo ")
+    puts(instruction.gsub("echo ", "").chomp)
+  end
+end
+
+def process_omi(instruction, hash, result)
+  if instruction.start_with?("omi ")
+    hash.each do |k, v|
+      instruction = instruction.gsub(k, v)
+    end  
+    print(instruction.chomp)
+    print(" [Y/n]: ")
+    input = $stdin.gets.chomp.downcase
+    abort if input == "n"
+    result = `#{instruction}`.split("[Result]")
+    command  = result[0]
+    response = result[1]
+    puts command
+    print("[response]> "); $stdin.gets.chomp
+    puts(response)
+    result = response
+  end
+  result
+end
+
+def assign(instruction, result, hash)
+  if /\$.+=.+/ =~ instruction
+    isp            = instruction.split("=").map{ |x| x.strip.chomp }
+    variable       = isp[0] 
+    regex          = Regexp.new(isp[1].gsub("_", "\\_") + "[^\"]+")
+    match          = regex.match(result).to_s
+    hash[variable] = match
+    puts "ASSIGNED: #{variable} => #{match}"
+  end
+  hash
+end
+
+result = ""
+hash   = {}
+
+File.open(story_path, "r").each do |instruction|
+  process_echo(instruction)
+  result = process_omi(instruction, hash, result)
+  hash   = assign(instruction, result, hash)
+end

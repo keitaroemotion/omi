@@ -39,6 +39,10 @@ module Lib
             #
             def fit(script_body, skey, api, prefix, options, host, value="")
                 if script_body.include?("$#{api}") 
+                    if options[api]
+                        return script_body.gsub("$#{api}", options[api])
+                    end
+
                     list = secondary_api_call(script_body, skey, api, prefix, value, host)
                     if api == "customer" && options["customer"]
                         value = options["customer"]

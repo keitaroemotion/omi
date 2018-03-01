@@ -248,6 +248,32 @@ When you get authentication failure from API, it means your command missing key 
 
 so just please add it to the last of the command.
 
+## Scenario execution such as DSL
+
+You can define the DSL scenario to preserve the combined execution of
+omi script. It also preserves the response object such as:
+
+```
+###############################################################
+# Daily                                                       #
+###############################################################
+echo make daily schedule, per 2 days, amount 100
+omi schedule create_daily amount=100 every=2
+
+$schd = schd_
+
+echo get the content of the schedule
+omi schedule get schedule=$schd
+```
+
+The line starts from `#` is the commented out area.
+Also, the blank line is going to be dismissed by the interpreter.
+
+`echo ` simply outputs the argument strings into the console.
+`omi ....` does execute the omi shell command.
+`$schd = schd_` is the `[variable_name] = regex_prefix`. In this case, we want to extract the
+`schd_...` from result object and assign it to the `$schd` variable.
+
 ## collecting_cards.html
 
 This file is the real example to demonstrate how to embed Omise.js to collect cards of your customers.

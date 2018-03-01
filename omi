@@ -108,6 +108,7 @@ def help(key=nil)
         "omi [trsch]    create_daily   ... create a daily transfer schedule",
         "omi [trsch]    create_weekly  ... create a weekly transfer schedule",
         "omi [trsch]    create_zig_zag ... create transfer schedule with inconsistent day per month",
+        "omi [scenario] [story_path]   ... execute the scenario",
         "omi [edit    ] [api_name] [key_word]",
     ]
     if key

@@ -9,6 +9,7 @@ module Lib
                     create_monthly: "create_monthly",
                     list:           "list_all",
                     list_of_recp:   "list_of_recp",
+                    get:            "get",
                 }
             end
 

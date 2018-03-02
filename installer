@@ -1,6 +1,24 @@
-cp omi /usr/local/bin/
-cp omil /usr/local/bin/
-mkdir -p /usr/local/etc/omi
-mkdir -p /usr/local/lib/omi
-cp -r scripts /usr/local/etc/omi
-cp -r lib/omi/*  /usr/local/lib/omi
+#!/usr/bin/env ruby
+
+system "cp omi /usr/local/bin/"
+system "cp omil /usr/local/bin/"
+system "mkdir -p /usr/local/etc/omi"
+system "mkdir -p /usr/local/lib/omi"
+system "cp -r scripts /usr/local/etc/omi"
+system "cp -r lib/omi/*  /usr/local/lib/omi"
+
+def set_if_free(api)
+  bin_path = "/usr/local/bin/#{api}"
+
+  if File.exist?(bin_path)
+    puts ("ALIAS MIGRATION FAILED: path '#{bin_path}' already exists. To avert corrupting the bin file you already have. Copy authomatically failed.")
+  else  
+    command = "cp alias/#{api} #{bin_path}"
+    puts      command
+    system    command
+    end
+end
+
+Dir["alias/*"].each do |d|
+  set_if_free(File.basename(d))
+end  

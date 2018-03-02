@@ -1,0 +1,15 @@
+#
+# THIS COMMAND IS TEST ONLY.
+# YOU MUST COLLECT CARDS WITH Omise.js
+#
+
+curl https://vault.omise.co/tokens \
+  -X POST \
+  -u $pkey \
+  -d "card[name]=Insufficient Fund" \
+  -d "card[number]=4111111111140011" \
+  -d "card[expiration_month]=10" \
+  -d "card[expiration_year]=2018" \
+  -d "card[city]=Bangkok" \
+  -d "card[postal_code]=10320" \
+  -d "card[security_code]=123"

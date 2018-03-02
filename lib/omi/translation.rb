@@ -42,6 +42,7 @@ module Lib
                 {
                     create: "create_a_token", 
                     get:    "retrieve_a_token",
+                    insufficient_fund: "create_an_insufficient_fund_token",
                 }
             end
             

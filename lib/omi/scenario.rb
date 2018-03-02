@@ -57,20 +57,32 @@ module Lib
       end
 
       def process_omi(instruction, hash, result)
+        ask = true
         if instruction.start_with?("omi ")
+
+          if instruction.include?("--no-ask")
+            instruction = instruction.gsub("--no-ask", "")
+            ask         = false
+          end
+
           hash.each do |k, v|
             return result if v.class == Array
             instruction = instruction.gsub(k, v)
           end  
-          print(instruction.chomp)
-          print(" [Y/n]: ")
-          input = $stdin.gets.chomp.downcase
-          abort if input == "n"
+          if ask
+            print(instruction.chomp)
+            print(" [Y/n]: ")
+            input = $stdin.gets.chomp.downcase
+            abort if input == "n"
+          end  
           result = `#{instruction}`.split("[Result]")
           command  = result[0]
           response = result[1]
           puts command
-          print("[response]> "); $stdin.gets.chomp
+          print("[response]> ")
+          if ask
+             $stdin.gets.chomp
+          end
           puts(response)
           result = response
         end
@@ -98,7 +110,7 @@ module Lib
         hash
       end
       
-      def execute
+      def execute()
         result = ""
         hash   = {}
         

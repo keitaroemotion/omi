@@ -240,6 +240,7 @@ def verbs
             delete
             create_wc
             add_card
+            insufficient_fund
             list
             list_of_recp
             get
@@ -498,6 +499,10 @@ else
             .map   { |a| /tokn_[a-z0-9_]+/.match(a).to_s }
             .flatten
             .uniq
-        `echo token=#{token.first} | pbcopy`    
+        if @argv.include?("--nocopy")    
+          puts token
+        else
+          `echo token=#{token.first} | pbcopy`    
+        end  
     end
 end    

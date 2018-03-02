@@ -23,7 +23,13 @@ SCRIPTS     = "#{RESOURCES}/scripts"
 CONFIG_PATH = "#{RESOURCES}/config"
 HAS_EQUAL   = /^.+\=.+$/
 
-@argv = ARGV.map { |a| Lib::Const.apis_pl.include?(a) ? [a[0...-1], "list"] : a }.flatten
+@argv    = ARGV
+             .select { |a| !a.start_with?("?")                                      }
+             .map    { |a| Lib::Const.apis_pl.include?(a) ? [a[0...-1], "list"] : a }
+             .flatten
+
+@filters = ARGV.select { |a| /^\?.+\=+.+$/ =~ a }
+@queries = ARGV.select { |a| /^\?[^\=]+$/ =~ a }
 
 if @argv.include?("scenario")
   Lib::Scenario.execute
@@ -441,6 +447,14 @@ else
     @lang = "curl"
 end    
 
+#
+# ?key=value
+#
+def query_conditions
+  q = @filters.map{ |a| a.gsub("?", "").chomp.split("=") }.flatten
+  Hash[*q]
+end
+
 def exec(command, detail)
     if @lang == "curl"
         shell_execution_result = `#{command}`
@@ -452,6 +466,25 @@ def exec(command, detail)
         system "rm #{tmp_exe}"
     end
     shell_execution_result
+end
+
+#
+# search options
+#
+if !@queries.empty?
+   root       = "curl -s 'https://api.omise.co/search?"
+   scope      = "scope=#{api}&"
+   query      = ""
+
+   unless @queries.empty?
+     query = "query=" + @queries.map{|a| a.gsub("?", "")}.join("&")
+   end  
+
+   conditions = query_conditions
+                  .map { |k, v| "filters\\[#{k}\\]=#{v}" }
+                  .join("&")
+   command     = (root + scope + [query, conditions].join("&") + "' -u #{skey}").gsub("&'", "'")
+   script_body = command
 end
 
 #

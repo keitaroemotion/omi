@@ -20,8 +20,8 @@ omi schedule create_daily amount=100 every=2 customer=$cust
 
 $schd = schd_
 
-echo get the content of the schedule --no-ask
-omi schedule get schedule=$schd
+echo get the content of the schedule
+omi schedule get schedule=$schd --no-ask
 
 #
 # Weekly

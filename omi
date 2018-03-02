@@ -87,6 +87,7 @@ def help(key=nil)
         "omi [token   ] create            ... create a token", 
         "omi [token   ] get               ... retrieve a token", 
         "omi [token   ] insufficient_fund ... create a token of card: insufficient_fund", 
+        "omi [token   ] payment_rejected  ... create a token of card: payment_rejected", 
         "omi [transfer] create    ... create_a_transfer",
         "omi [transfer] cr3       ... create_a_transfer_to_third_party_recipient",
         "omi [transfer] delete    ... delete_a_transfer",
@@ -242,6 +243,7 @@ def verbs
             create_wc
             add_card
             insufficient_fund
+            payment_rejected
             list
             list_of_recp
             get

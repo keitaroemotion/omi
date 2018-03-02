@@ -49,7 +49,20 @@ module Lib
           end
         end
       end
-     
+    
+      def assert(instruction, result)
+        if instruction.start_with?("assert ")
+          regex = Regexp.new(instruction.gsub("assert ", "").strip.gsub(" ", ".+"))
+          print("ASSERT #{regex.to_s}: [")
+          if regex =~ result
+            print("OK".green)
+          else  
+            print("NG".red)
+          end
+          puts("]")
+        end  
+      end
+
       def process_shell(instruction)
         if instruction.start_with?("shell:")
           system instruction.gsub("shell:", "")
@@ -123,6 +136,7 @@ module Lib
             process_echo(instruction)
             result = process_omi(instruction, hash, result)
             hash   = assign(instruction, result, hash)
+            assert(instruction, result)
             process_loop_omi(instruction, hash, result)
           end
         end 

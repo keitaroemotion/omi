@@ -267,7 +267,7 @@ For instance, the following command
 $ omi charges ?John ?created=2018-02-02 -d 
 ```
 
-is build like this:
+is built like this:
 
 ```
 $ curl -s 'https://api.omise.co/search?scope=charge&query=John&filters\[created\]=2018-02-02' -u skey_test_5b3qimoomin4jmc0htit:

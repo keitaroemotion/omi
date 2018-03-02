@@ -2,12 +2,11 @@ module Lib
     class Find 
         class << self
             require "json"
-            def secondary_api_call(script_body, skey, api, prefix, value, host)
+            def secondary_api_call(script_body, skey, api, prefix, value, host, cust)
                 puts
                 if api == "card"
-                    puts api
-                    abort("value is blank") if value.nil?
-                    cmd = "curl -s -X GET #{host}/customers/#{value}/cards -u #{skey}"
+                    abort("Customer is not found.") if cust.nil?
+                    cmd = "curl -s -X GET #{host}/customers/#{cust}/cards -u #{skey}"
                 else    
                     cmd = "curl -s -X GET #{host}/#{api}s -u #{skey}"
                 end
@@ -38,32 +37,32 @@ module Lib
             # existing values, then, let user choose the one,
             # and eventually this value is assigned to the main script_body
             #
-            def fit(script_body, skey, api, prefix, options, host, value="")
+            def fit(script_body, skey, api, prefix, options, host, value, cust="")
                 if script_body.include?("$#{api}") 
                     if options[api]
-                        return script_body.gsub("$#{api}", options[api])
+                        return [script_body.gsub("$#{api}", options[api]), options[api]]
                     end
-
-                    list = secondary_api_call(script_body, skey, api, prefix, value, host)
                     if api == "customer" && options["customer"]
                         value = options["customer"]
-                    else
-                        if list["data"].nil? || list["data"].size == 0
-                            abort("[#{api}]:               No record")
-                        elsif list["data"].size == 1    
-                            value = list["data"][0]["id"]
-                        else  
-                            list = list["data"].select { |a| a["status"] != "deleted" }
-                            fit_map(list, prefix).each_with_index { |e, i| puts "[#{i}] #{e}\n"; puts }
-                            print "\n[which?][q:Quit] "    
-                            input = $stdin.gets.chomp
-                            abort if input.downcase == "q"
-                            if list.size <= input.to_i
-                              abort("index out of range.")
-                            end
-                            value = list[input.to_i]["id"]
-                        end
                     end    
+
+                    list = secondary_api_call(script_body, skey, api, prefix, value, host, cust)
+                    
+                    if list["data"].nil? || list["data"].size == 0
+                        abort("[#{api}]:               No record")
+                    elsif list["data"].size == 1    
+                        value = list["data"][0]["id"]
+                    else  
+                        list = list["data"].select { |a| a["status"] != "deleted" }
+                        fit_map(list, prefix).each_with_index { |e, i| puts "[#{i}] #{e}\n"; puts }
+                        print "\n[which?][q:Quit] "    
+                        input = $stdin.gets.chomp
+                        abort if input.downcase == "q"
+                        if list.size <= input.to_i
+                          abort("index out of range.")
+                        end
+                        value = list[input.to_i]["id"]
+                    end
                     script_body = script_body.gsub("$#{api}", value)
                 end
                 [script_body, value]

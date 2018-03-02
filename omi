@@ -352,10 +352,10 @@ end
     script_body = gsub(var, script_body, options, config_hash)
 end
 
-script_body, value = Lib::Find.fit(script_body, skey, "recipient", "recp_", options, host)
-script_body, value = Lib::Find.fit(script_body, skey, "customer", "cust_", options, host)
-script_body, value = Lib::Find.fit(script_body, skey, "charge", "chrg_", options, host, value)
-script_body, value = Lib::Find.fit(script_body, skey, "card", "card_", options, host, value)
+script_body, value = Lib::Find.fit(script_body, skey, "recipient", "recp_", options, host, "")
+script_body, cust  = Lib::Find.fit(script_body, skey, "customer", "cust_", options, host, "")
+script_body, value = Lib::Find.fit(script_body, skey, "charge", "chrg_", options, host, cust)
+script_body, value = Lib::Find.fit(script_body, skey, "card", "card_", options, host, value, cust)
 script_body, value = Lib::Find.fit(script_body, skey, "schedule", "schd_", options, host, value)
 
 #

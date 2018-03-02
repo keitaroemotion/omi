@@ -471,7 +471,7 @@ end
 #
 # search options
 #
-if !@queries.empty?
+if !(@queries.empty? && @filters.empty?)
    root       = "curl -s 'https://api.omise.co/search?"
    scope      = "scope=#{api}&"
    query      = ""
@@ -483,7 +483,10 @@ if !@queries.empty?
    conditions = query_conditions
                   .map { |k, v| "filters\\[#{k}\\]=#{v}" }
                   .join("&")
-   command     = (root + scope + [query, conditions].join("&") + "' -u #{skey}").gsub("&'", "'")
+   command    = (root + scope + [query, conditions].join("&") + "' -u #{skey}")
+                  .gsub("&'", "'")
+                  .gsub("&&", "&")
+                  
    script_body = command
 end
 

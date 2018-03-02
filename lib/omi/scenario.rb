@@ -17,11 +17,34 @@ module Lib
         key = ARGV.select{ |a| a.start_with?("skey_") }.first 
         key
       end
-      
+
+      def all_scenarios
+        Dir["/usr/local/etc/omi/scenario/*"]
+      end
+
+      def choose_scenario(scenarios)
+        if scenarios.size == 1
+          return scenarios[0]
+        end
+
+        scenarios.each_with_index do |s, i|
+          puts "[#{i}] #{File.basename(s)}"
+        end
+        print("[q: quit] ")
+        input = $stdin.gets.chomp
+        if /^\d+$/ =~ input
+          scenarios[input.to_i]
+        elsif input == "q"
+          abort
+        else
+          regex = Regexp.new(input.gsub(" ", ".+"))
+          scenarios = scenarios.select{|s| regex =~ s}
+          choose_scenario(scenarios.empty? ? all_scenarios : scenarios)
+        end
+      end
+
       def get_story_path
-        path = ARGV.select{ |a| File.exist?(a) && a.end_with?(".story") }.first
-        abort("story_path missing") unless path
-        path
+        choose_scenario(all_scenarios)
       end
       
       def process_echo(instruction)
@@ -123,11 +146,11 @@ module Lib
         hash
       end
       
-      def execute()
+      def execute(story_path=get_story_path)
         result = ""
         hash   = {}
         
-        File.open(get_story_path, "r").each do |instruction|
+        File.open(story_path, "r").each do |instruction|
           if instruction.strip == "abort"
             abort
           end
@@ -140,6 +163,8 @@ module Lib
             process_loop_omi(instruction, hash, result)
           end
         end 
+        puts "\n[Scenario Completed]\n".magenta
+        execute
       end  
     end  
   end  

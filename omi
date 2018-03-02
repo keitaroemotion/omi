@@ -129,6 +129,8 @@ def help(key=nil)
     puts "[option: -v allows viewing the execution result]"
     puts "[option: -l swaps URL into localhost]"
     puts "[option: count counts the number of result records]"
+    puts "[option: ?[key]=[value] Filter Search ]"
+    puts "[option: ?[keyword] Query Search]"
     puts "[option: --rich enables rich output]"
     puts
     abort

@@ -248,6 +248,31 @@ When you get authentication failure from API, it means your command missing key 
 
 so just please add it to the last of the command.
 
+## Filter Seach
+
+In order to filter the enlisted records, you need additional params such as:
+
+```
+?[key]=[value]
+```
+or
+
+```
+?[keyword]
+```
+
+For instance, the following command
+
+```
+$ omi charges ?John ?created=2018-02-02 -d 
+```
+
+is build like this:
+
+```
+$ curl -s 'https://api.omise.co/search?scope=charge&query=John&filters\[created\]=2018-02-02' -u skey_test_5b3qimoomin4jmc0htit:
+```
+
 ## Scenario execution DSL
 
 You can define the DSL scenario to preserve the combined execution of

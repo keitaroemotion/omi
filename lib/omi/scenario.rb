@@ -30,9 +30,18 @@ module Lib
         scenarios.each_with_index do |s, i|
           puts "[#{i}] #{File.basename(s)}"
         end
-        print("[q: quit] ")
+        print("[q: quit e\\s\\d+: edit] ")
         input = $stdin.gets.chomp
-        if /^\d+$/ =~ input
+        if /^e\s+\d+$/ =~ input
+          index = /\d+/.match(input).to_s.strip.to_i
+          if scenarios.size > index
+            file = scenarios[index]
+            system "vim #{file}"
+          else
+            puts "Index is Out of Range".red
+          end
+          choose_scenario(scenarios)
+        elsif /^\d+$/ =~ input
           scenarios[input.to_i]
         elsif input == "q"
           abort

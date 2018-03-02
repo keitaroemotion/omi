@@ -6,6 +6,7 @@ module Lib
                 puts
                 if api == "card"
                     puts api
+                    abort("value is blank") if value.nil?
                     cmd = "curl -s -X GET #{host}/customers/#{value}/cards -u #{skey}"
                 else    
                     cmd = "curl -s -X GET #{host}/#{api}s -u #{skey}"
@@ -47,7 +48,7 @@ module Lib
                     if api == "customer" && options["customer"]
                         value = options["customer"]
                     else
-                        if list["data"].size == 0
+                        if list["data"].nil? || list["data"].size == 0
                             abort("[#{api}]:               No record")
                         elsif list["data"].size == 1    
                             value = list["data"][0]["id"]

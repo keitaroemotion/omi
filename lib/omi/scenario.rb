@@ -30,9 +30,14 @@ module Lib
         scenarios.each_with_index do |s, i|
           puts "[#{i}] #{File.basename(s)}"
         end
-        print("[q: quit e\\s\\d+: edit] ")
+        print("[q: quit e\\s\\d+: edit n: new] ")
         input = $stdin.gets.chomp
-        if /^e\s+\d+$/ =~ input
+        if input == "n"
+          print "[New Scenario Name]: "
+          file = "/usr/local/etc/omi/scenario/" + $stdin.gets.chomp + ".story"
+          system "vim #{file}"
+          choose_scenario(scenarios)
+        elsif /^e\s+\d+$/ =~ input
           index = /\d+/.match(input).to_s.strip.to_i
           if scenarios.size > index
             file = scenarios[index]

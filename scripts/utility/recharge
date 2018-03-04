@@ -1,0 +1,66 @@
+#!/usr/bin/env ruby
+
+require "json"
+
+#
+# the intension of this script is as follows:
+#
+#
+# 1. collect all failed cards, using search API
+# 2. charge those cards again
+#
+
+skey = ARGV[0]
+skey = "skey_test_5b3qijwxm04jmc0htit"
+
+if /^skey_/ !~ skey
+  abort "SKEY #{skey} is invalid."
+end
+
+command = "curl -s 'https://api.omise.co/search?scope=charge&filters\\[failure_code\\]=insufficient_fund' -u #{skey}:"
+
+puts command
+failed_charges = `#{command}`
+
+bad_cards = JSON
+              .parse(failed_charges)["data"]
+              .map   { |x|
+                location = x["card"]["location"]
+                [ 
+                  /cust_[^\/]+/.match(location).to_s,
+                  /card_[^\/]+/.match(location).to_s,
+                  x["amount"],
+                  x["created"],
+                ]
+              }
+              .select{ |x| x[0] != "" && x[1] != "" }
+              .uniq
+
+puts "----------------------------------------------\n\n"
+puts "RE-CHARGE"
+puts "\n----------------------------------------------\n"
+
+message = ""
+
+bad_cards.each do |customer, old_card, amount, created|
+  command =  "curl https://api.omise.co/charges \\\n " \
+    " -X POST \\\n " \
+    " -u #{skey}: \\\n " \
+    " -d 'amount=#{amount}' \\\n " \
+    " -d 'currency=jpy' \\\n " \
+    " -d 'card=[NEW TOKEN OF CUSTOMER #{customer}]'"
+   message = [
+     "CREATED:                           #{created}",
+     "OLD CARD WAS:                      #{old_card}",
+     "YOU NEED TO GET TOKEN OF CUSTOMER: #{customer}\n\n",
+     command,
+   ].join("\n")
+end    
+
+puts bad_cards
+
+tmp = ".tmpfileforjson"
+File.open(tmp, "w") do |f|
+  f.puts message
+end
+system("vim #{tmp}") 

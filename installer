@@ -5,7 +5,7 @@ system "cp omil /usr/local/bin/"
 system "mkdir -p /usr/local/etc/omi"
 system "mkdir -p /usr/local/lib/omi"
 system "cp -r scripts /usr/local/etc/omi"
-system "cp -r scenario /usr/local/etc/omi"
+# system "cp -r scenario /usr/local/etc/omi"
 system "cp -r lib/omi/*  /usr/local/lib/omi"
 
 def set_if_free(api)

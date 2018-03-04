@@ -27,9 +27,11 @@ module Lib
           return scenarios[0]
         end
 
+        puts
         scenarios.each_with_index do |s, i|
           puts "[#{i}] #{File.basename(s)}"
         end
+        puts
         print("[q: quit e\\s\\d+: edit n: new] ")
         input = $stdin.gets.chomp
         if input == "n"
@@ -114,11 +116,13 @@ module Lib
             instruction = instruction.gsub("--no-ask", "")
             ask         = false
           end
-
           hash.each do |k, v|
-            return result if v.class == Array
-            instruction = instruction.gsub(k, v)
+            unless k.strip.include?(" ")
+              return result if v.class == Array
+              instruction = instruction.gsub(k, v)
+            end 
           end  
+
           if ask
             print(instruction.chomp)
             print(" [Y/n]: ")

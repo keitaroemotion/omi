@@ -48,3 +48,27 @@ curl_command = "curl -s https://api.omise.co/charges \\\n" \
 # YOU WANT TO EXECUTE THE FOLLOWING COMMAND:
 #
 puts curl_command
+
+users_scheduled_charge_start_date = Date.new(
+                                              users_sign_in_date.year,
+                                              users_sign_in_date.month + 1,
+                                              1
+                                            )  
+stupidly_large_number = 10000                                            
+users_scheduled_charge_end_date   = users_scheduled_charge_start_date + stupidly_large_number
+
+assert "2018-04-01", users_scheduled_charge_start_date.to_s
+assert "2045-08-17", users_scheduled_charge_end_date.to_s
+
+schedule_command = "curl -s https://api.omise.co/schedules\\\n" \
+                   "  -X POST \\\n" \
+                   "  -u #{skey}: \\\n" \
+                   "  -d \"every=1\" \\\n" \
+                   "  -d \"period=month\" \\\n" \
+                   "  -d \"on[days_of_month][]=25\" \\\n" \
+                   "  -d \"start_date=2018-03-06\" \\\n" \
+                   "  -d \"end_date=2118-02-10\" \\\n" \
+                   "  -d \"charge[customer]=#{customer_id}\" \\\n" \
+                   "  -d \"charge[amount]=#{charge_amount}\" \\\n" \
+                   "  -d \"charge[description]=Membership fee\""
+puts schedule_command                   

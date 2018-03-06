@@ -92,29 +92,52 @@ def create_schedule(skey, user, day)
 end
 
 skey = ARGV[0]
+
+
+#
+# Case 1: signin_date: 2018/3/15
+#
+
 user = User.new(
          sign_in_date:  Date.new(2018, 3, 15),
          charge_amount: 2000,
          customer_id:   "cust_test_5b4vkgkeal49aafdo2k"
        )
-
 Test.assert 17, user.days_remained
-
 Test.assert 34000, user.hiwari_amount_total
-
-#
-# YOU WANT TO EXECUTE THE FOLLOWING COMMAND:
-#
 puts charge(skey, user.hiwari_amount_total, user)
-
 Test.assert "2018-04-01", user.scheduled_charge_start_date.to_s
 Test.assert "2045-08-17", user.scheduled_charge_end_date.to_s
-
 puts create_schedule(skey, user, "25")
 
 #
-# XXX TODO: need test when user sign_in date is the following:
-#         
-#           1. 1st  day of the month
-#           2. last day of the month
+# Case 2: signin_date: 2018/3/1
 #
+
+user = User.new(
+         sign_in_date:  Date.new(2018, 3, 1),
+         charge_amount: 100,
+         customer_id:   "cust_test_5b4vkgkeal49aafdo2k"
+       )
+Test.assert 31,   user.days_remained
+Test.assert 3100, user.hiwari_amount_total
+puts charge(skey, user.hiwari_amount_total, user)
+Test.assert "2018-04-01", user.scheduled_charge_start_date.to_s
+Test.assert "2045-08-17", user.scheduled_charge_end_date.to_s
+puts create_schedule(skey, user, "25")
+
+#
+# Case 3: signin_date: 2018/3/31
+#
+
+user = User.new(
+         sign_in_date:  Date.new(2018, 3, 31),
+         charge_amount: 100,
+         customer_id:   "cust_test_5b4vkgkeal49aafdo2k"
+       )
+Test.assert 1,    user.days_remained
+Test.assert 100,  user.hiwari_amount_total
+puts charge(skey, user.hiwari_amount_total, user)
+Test.assert "2018-04-01", user.scheduled_charge_start_date.to_s
+Test.assert "2045-08-17", user.scheduled_charge_end_date.to_s
+puts create_schedule(skey, user, "25")

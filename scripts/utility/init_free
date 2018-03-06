@@ -8,14 +8,7 @@
 # 18 19 20 21 22 23 24  
 # 25 26 27 28 29 30 31  
 #
-# This means the days_remained is 17.
-# Supposed that the customer is going to be charged with
-# 2000 yen...
-#
-# FOR THE INTENSION TO MAKE IT RECOGNIZABLE TO
-# JAPANESE DEVELOPERS, THE TERM "HIWARI" IS USED
-# WHICH MEANS CHARGE PER DAY.
-#
+
 
 require 'date'
 

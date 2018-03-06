@@ -19,56 +19,102 @@
 
 require 'date'
 
-def assert(expected, real)
-  if expected != real
-    abort("expected: #{expected}, real: #{real}")
+class Test
+  def self.assert(expected, real)
+    if expected != real
+      abort("expected: #{expected}, real: #{real}")
+    end
+  end
+end  
+
+class User
+  #
+  # intentionally refrains from using attr_reader
+  # so that the structure is easy to be grasped for now
+  # 
+  def initialize(sign_in_date:, charge_amount:, customer_id:)
+    @sign_in_date          = sign_in_date
+    @charge_amount         = charge_amount
+    @customer_id           = customer_id
+    @stupidly_large_number = 10000                                            
+  end
+
+  def sign_in_date
+    @sign_in_date
+  end
+
+  def charge_amount
+    @charge_amount
+  end
+
+  def customer_id
+    @customer_id
+  end
+
+  def scheduled_charge_start_date
+    Date.new(@sign_in_date.year, @sign_in_date.month + 1, 1)
+  end  
+
+  def scheduled_charge_end_date
+    scheduled_charge_start_date + @stupidly_large_number
+  end  
+
+  def days_remained
+    Date.new(sign_in_date.year, sign_in_date.month, -1).day - sign_in_date.day + 1
+  end
+
+  def hiwari_amount_total
+    days_remained * charge_amount
   end
 end
 
-users_sign_in_date     = Date.new(2018, 3, 15)
-days_in_month_of_march = 31
-charge_amount          = 2000
-customer_id            = "cust_test_5b4vkgkeal49aafdo2k"
-skey                   = ARGV[0]
+def charge(skey, hiwari_amount_total, user)
+  "curl -s https://api.omise.co/charges \\\n" \
+  "  -X POST \\\n" \
+  "  -u #{skey}: \\\n" \
+  "  -d \"amount=#{hiwari_amount_total}\" \\\n" \
+  "  -d \"currency=jpy\" \\\n" \
+  "  -d \"customer=#{user.customer_id}\""
+end
 
-days_remained          = days_in_month_of_march - users_sign_in_date.day + 1
-assert 17, days_remained
+def create_schedule(skey, user, day)
+  "curl -s https://api.omise.co/schedules\\\n" \
+  "  -X POST \\\n" \
+  "  -u #{skey}: \\\n" \
+  "  -d \"every=1\" \\\n" \
+  "  -d \"period=month\" \\\n" \
+  "  -d \"on[days_of_month][]=#{day}\" \\\n" \
+  "  -d \"start_date=#{user.scheduled_charge_start_date}\" \\\n" \
+  "  -d \"end_date=#{user.scheduled_charge_end_date}\" \\\n" \
+  "  -d \"charge[customer]=#{user.customer_id}\" \\\n" \
+  "  -d \"charge[amount]=#{user.charge_amount}\" \\\n" \
+  "  -d \"charge[description]=Membership fee\""
+end
 
-hiwari_amount_total = days_remained * charge_amount
-assert 34000, hiwari_amount_total
+skey = ARGV[0]
+user = User.new(
+         sign_in_date:  Date.new(2018, 3, 15),
+         charge_amount: 2000,
+         customer_id:   "cust_test_5b4vkgkeal49aafdo2k"
+       )
 
-curl_command = "curl -s https://api.omise.co/charges \\\n" \
-               "  -X POST \\\n" \
-               "  -u #{skey}: \\\n" \
-               "  -d \"amount=#{hiwari_amount_total}\" \\\n" \
-               "  -d \"currency=jpy\" \\\n" \
-               "  -d \"customer=#{customer_id}\""
+Test.assert 17, user.days_remained
+
+Test.assert 34000, user.hiwari_amount_total
 
 #
 # YOU WANT TO EXECUTE THE FOLLOWING COMMAND:
 #
-puts curl_command
+puts charge(skey, user.hiwari_amount_total, user)
 
-users_scheduled_charge_start_date = Date.new(
-                                              users_sign_in_date.year,
-                                              users_sign_in_date.month + 1,
-                                              1
-                                            )  
-stupidly_large_number = 10000                                            
-users_scheduled_charge_end_date   = users_scheduled_charge_start_date + stupidly_large_number
+Test.assert "2018-04-01", user.scheduled_charge_start_date.to_s
+Test.assert "2045-08-17", user.scheduled_charge_end_date.to_s
 
-assert "2018-04-01", users_scheduled_charge_start_date.to_s
-assert "2045-08-17", users_scheduled_charge_end_date.to_s
+puts create_schedule(skey, user, "25")
 
-schedule_command = "curl -s https://api.omise.co/schedules\\\n" \
-                   "  -X POST \\\n" \
-                   "  -u #{skey}: \\\n" \
-                   "  -d \"every=1\" \\\n" \
-                   "  -d \"period=month\" \\\n" \
-                   "  -d \"on[days_of_month][]=25\" \\\n" \
-                   "  -d \"start_date=2018-03-06\" \\\n" \
-                   "  -d \"end_date=2118-02-10\" \\\n" \
-                   "  -d \"charge[customer]=#{customer_id}\" \\\n" \
-                   "  -d \"charge[amount]=#{charge_amount}\" \\\n" \
-                   "  -d \"charge[description]=Membership fee\""
-puts schedule_command                   
+#
+# XXX TODO: need test when user sign_in date is the following:
+#         
+#           1. 1st  day of the month
+#           2. last day of the month
+#

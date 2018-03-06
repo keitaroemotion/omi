@@ -124,6 +124,7 @@ def help(key=nil)
     end
     puts
     list.each {|x| puts x}
+    puts "[option: scenario play scenario]"
     puts "[option: -d dry_run]"
     puts "[option: -e allows editing the command before execution]"
     puts "[option: -v allows viewing the execution result]"

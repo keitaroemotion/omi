@@ -1,0 +1,116 @@
+#!/usr/bin/env ruby
+
+#      March 2018       
+# Su Mo Tu We Th Fr Sa  
+#              1  2  3  
+#  4  5  6  7  8  9 10  
+# 11 12 13 14[15]16 17  
+# 18 19 20 21 22 23 24  
+# 25 26 27 28 29 30 31  
+#
+# This means the days_remained is 17.
+# Supposed that the customer is going to be charged with
+# 2000 yen...
+#
+# FOR THE INTENSION TO MAKE IT RECOGNIZABLE TO
+# JAPANESE DEVELOPERS, THE TERM "HIWARI" IS USED
+# WHICH MEANS CHARGE PER DAY.
+#
+
+require 'date'
+
+class Test
+  def self.assert(expected, real)
+    if expected != real
+      abort("expected: #{expected}, real: #{real}")
+    end
+  end
+end  
+
+class User
+  #
+  # intentionally refrains from using attr_reader
+  # so that the structure is easy to be grasped for now
+  # 
+  def initialize(sign_in_date:, charge_amount:, customer_id:)
+    @sign_in_date          = sign_in_date
+    @charge_amount         = charge_amount
+    @customer_id           = customer_id
+    @stupidly_large_number = 10000                                            
+  end
+
+  def sign_in_date
+    @sign_in_date
+  end
+
+  def charge_amount
+    @charge_amount
+  end
+
+  def customer_id
+    @customer_id
+  end
+
+  def scheduled_charge_start_date
+    Date.new(@sign_in_date.year, @sign_in_date.month + 1, 1)
+  end  
+
+  def scheduled_charge_end_date
+    scheduled_charge_start_date + @stupidly_large_number
+  end  
+end
+
+def create_schedule(skey, user, day)
+  "curl -s https://api.omise.co/schedules\\\n" \
+  "  -X POST \\\n" \
+  "  -u #{skey}: \\\n" \
+  "  -d \"every=1\" \\\n" \
+  "  -d \"period=month\" \\\n" \
+  "  -d \"on[days_of_month][]=#{day}\" \\\n" \
+  "  -d \"start_date=#{user.scheduled_charge_start_date}\" \\\n" \
+  "  -d \"end_date=#{user.scheduled_charge_end_date}\" \\\n" \
+  "  -d \"charge[customer]=#{user.customer_id}\" \\\n" \
+  "  -d \"charge[amount]=#{user.charge_amount}\" \\\n" \
+  "  -d \"charge[description]=Membership fee\""
+end
+
+skey = ARGV[0]
+
+#
+# Case 1: signin_date: 2018/3/15
+#         then, the charge starts from 2018/4/1
+#
+user = User.new(
+         sign_in_date:  Date.new(2018, 3, 15),
+         charge_amount: 2000,
+         customer_id:   "cust_test_5b4vkgkeal49aafdo2k"
+       )
+Test.assert "2018-04-01", user.scheduled_charge_start_date.to_s
+Test.assert "2045-08-17", user.scheduled_charge_end_date.to_s
+puts create_schedule(skey, user, "25")
+
+#
+# Case 2: signin_date: 2018/3/1
+#         then, the charge starts from 2018/4/1
+#
+user = User.new(
+         sign_in_date:  Date.new(2018, 3, 1),
+         charge_amount: 2000,
+         customer_id:   "cust_test_5b4vkgkeal49aafdo2k"
+       )
+Test.assert "2018-04-01", user.scheduled_charge_start_date.to_s
+Test.assert "2045-08-17", user.scheduled_charge_end_date.to_s
+puts create_schedule(skey, user, "25")
+
+#
+# Case 3: signin_date: 2018/3/31
+#         then, the charge starts from 2018/4/1
+#
+user = User.new(
+         sign_in_date:  Date.new(2018, 3, 31),
+         charge_amount: 2000,
+         customer_id:   "cust_test_5b4vkgkeal49aafdo2k"
+       )
+Test.assert "2018-04-01", user.scheduled_charge_start_date.to_s
+Test.assert "2045-08-17", user.scheduled_charge_end_date.to_s
+puts create_schedule(skey, user, "25")
